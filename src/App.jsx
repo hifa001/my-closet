@@ -133,8 +133,24 @@ export default function App() {
   const [calDay, setCalDay] = useState(null);
   const [calMonth, setCalMonth] = useState(() => ({year: new Date().getFullYear(), month: new Date().getMonth()}));
   useEffect(() => {
-    localStorage.setItem('closet-items', JSON / stringify(items))''
+    localStorage.setItem('closet-items', JSON.stringify(items));
   }, [items]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-outfits', JSON.stringify(outfits));
+  }, [outfits]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-collections', JSON.stringify(collections));
+  }, [collections]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
+  }, [calOutfits]);
   const fileRef = useRef();
 
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
