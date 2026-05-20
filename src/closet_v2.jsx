@@ -114,14 +114,6 @@ export default function App() {
   const [showOutfitBuilder, setShowOutfitBuilder] = useState(false);
   const [outfitName, setOutfitName] = useState("");
   const [statView, setStatView] = useState("clothing");
-  const [showCollage, setShowCollage] = useState(false);
-  const [collageOutfit, setCollageOutfit] = useState(null);
-  const [showGhostModel, setShowGhostModel] = useState(false);
-  const [ghostOutfit, setGhostOutfit] = useState(null);
-  const [calOutfits, setCalOutfits] = useState({});
-  const [showCalDay, setShowCalDay] = useState(false);
-  const [calDay, setCalDay] = useState(null);
-  const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }));
   const fileRef = useRef();
 
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
@@ -231,7 +223,7 @@ export default function App() {
               {neverWorn.slice(0, 7).map(item => (
                 <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 68, cursor: "pointer"}}>
                   <div style={{height: 84, background: C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={68} />}
+                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={68} />}
                   </div>
                   <div style={{fontSize: 9, color: C.textMuted, textAlign: "center", lineHeight: 1.2}}>{item.brand}</div>
                 </div>
@@ -249,7 +241,7 @@ export default function App() {
           {[...items].sort((a, b) => b.wears - a.wears).slice(0, 4).map((item, i, arr) => (
             <div key={item.id} onClick={() => openEdit(item)} style={{display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: i < arr.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
               <div style={{width: 42, height: 52, background: C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={42} />}
+                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={42} />}
               </div>
               <div style={{flex: 1}}>
                 <div style={{fontSize: 11, color: C.textMuted}}>{item.brand}</div>
@@ -295,8 +287,8 @@ export default function App() {
         <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, padding: "0 12px"}}>
           {filtered.map(item => (
             <div key={item.id} onClick={() => openEdit(item)} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`}}>
-              <div style={{height: 150, background: item.photo ? "#fff" : C.surface2, position: "relative", overflow: "hidden"}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain", padding: 4}} /> : <Placeholder item={item} size={80} />}
+              <div style={{height: 150, background: C.surface2, position: "relative", overflow: "hidden"}}>
+                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={80} />}
                 {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 6px", borderRadius: 5}}>2ND</div>}
               </div>
               <div style={{padding: "7px 9px 10px"}}>
@@ -317,22 +309,12 @@ export default function App() {
             : outfits.map(o => (
               <div key={o.id} style={{background: C.surface, borderRadius: 12, border: `0.5px solid ${C.border}`, padding: "12px 14px", marginBottom: 10}}>
                 <div style={{fontSize: 14, fontWeight: 500, marginBottom: 8}}>{o.name}</div>
-                <div style={{display: "flex", gap: 6, marginBottom: 10}}>
+                <div style={{display: "flex", gap: 6}}>
                   {o.items.slice(0, 5).map(item => (
                     <div key={item.id} style={{width: 50, height: 62, background: C.surface2, borderRadius: 8, overflow: "hidden", flexShrink: 0}}>
-                      {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={50} />}
+                      {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={50} />}
                     </div>
                   ))}
-                </div>
-                <div style={{display: "flex", gap: 6}}>
-                  <button onClick={() => {setCollageOutfit(o); setShowCollage(true);}} style={{flex: 1, padding: "7px 10px", background: C.accent, color: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
-                    <i className="ti ti-layout-grid" style={{fontSize: 13}} aria-hidden="true" />
-                    Collage
-                  </button>
-                  <button onClick={() => {setGhostOutfit(o); setShowGhostModel(true);}} style={{flex: 1, padding: "7px 10px", background: C.surface2, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
-                    <i className="ti ti-man" style={{fontSize: 13}} aria-hidden="true" />
-                    Ghost Model
-                  </button>
                 </div>
               </div>
             ))
@@ -439,31 +421,6 @@ export default function App() {
           </div>
           <div style={{padding: "0 16px"}}>
             {["Color", "Status", "Price", "Fabric", "Size", "Season", "Brand"].map(l => <Row key={l} label={l} />)}
-          </div>
-        </Card>
-      </div>
-
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <CardHead icon="chart-bar" title="Composition" sub="Breakdown by category" />
-          <div style={{padding: "14px 16px"}}>
-            {CATEGORIES.map(cat => {
-              const count = items.filter(i => i.category === cat.name).length;
-              if (count === 0) return null;
-              const pct = Math.round(count / items.length * 100);
-              return (
-                <div key={cat.name} style={{marginBottom: 11}}>
-                  <div style={{display:"flex", justifyContent:"space-between", marginBottom:4}}>
-                    <span style={{fontSize:12, color:C.textMid}}>{cat.name}</span>
-                    <span style={{fontSize:12, color:C.textMuted}}>{count} &nbsp;({pct}%)</span>
-                  </div>
-                  <div style={{height:6, background:C.surface2, borderRadius:3, overflow:"hidden"}}>
-                    <div style={{height:"100%", width:`${pct}%`, background:C.accent, borderRadius:3, transition:"width 0.4s"}} />
-                  </div>
-                </div>
-              );
-            })}
-            {items.length === 0 && <div style={{fontSize:12,color:C.textMuted}}>Add items to see composition.</div>}
           </div>
         </Card>
       </div>
@@ -744,7 +701,7 @@ export default function App() {
               : <div style={{display: "flex", gap: 8, overflowX: "auto"}}>
                 {sel.map(item => (
                   <div key={item.id} onClick={() => toggle(item)} style={{flexShrink: 0, width: 56, height: 70, background: C.surface2, borderRadius: 8, overflow: "hidden", border: `2px solid ${C.accent}`}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={56} />}
+                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={56} />}
                   </div>
                 ))}
               </div>
@@ -755,7 +712,7 @@ export default function App() {
               {items.map(item => (
                 <div key={item.id} onClick={() => toggle(item)} style={{position: "relative", borderRadius: 10, overflow: "hidden", border: `2px solid ${sel.find(i => i.id === item.id) ? C.accent : C.border}`, cursor: "pointer"}}>
                   <div style={{height: 86, background: C.surface2}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={80} />}
+                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={80} />}
                   </div>
                   <div style={{padding: "4px 6px 6px", fontSize: 9, color: C.textMuted}}>{item.brand}</div>
                   {sel.find(i => i.id === item.id) && <div style={{position: "absolute", top: 5, right: 5, width: 18, height: 18, background: C.accent, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-check" style={{fontSize: 11, color: "#fff"}} aria-hidden="true" /></div>}
@@ -772,352 +729,10 @@ export default function App() {
     );
   };
 
-  const OutfitCollage = () => {
-    const o = collageOutfit;
-
-    // All hooks before any conditional return (Rules of Hooks)
-    const [pieces, setPieces] = useState(() =>
-      o ? o.items.map((item, i) => ({
-        pid: i,
-        item,
-        x: 24 + (i % 2) * 168,
-        y: 24 + Math.floor(i / 2) * 210,
-        w: 148,
-        h: 182,
-        flip: false,
-        border: false,
-        z: i + 1,
-      })) : []
-    );
-    const [sel, setSel] = useState(null);
-    const dragRef = useRef(null);
-    const maxZRef = useRef(o ? o.items.length : 0);
-
-    if (!o) return null;
-
-    const startDrag = (e, pid) => {
-      e.stopPropagation();
-      e.currentTarget.setPointerCapture(e.pointerId);
-      setSel(pid);
-      maxZRef.current += 1;
-      const mz = maxZRef.current;
-      setPieces(prev => prev.map(p => p.pid === pid ? {...p, z: mz} : p));
-      const piece = pieces.find(p => p.pid === pid);
-      dragRef.current = {pid, px: e.clientX, py: e.clientY, ox: piece.x, oy: piece.y};
-    };
-
-    const moveDrag = (e) => {
-      if (!dragRef.current) return;
-      const dx = e.clientX - dragRef.current.px;
-      const dy = e.clientY - dragRef.current.py;
-      setPieces(prev => prev.map(p =>
-        p.pid === dragRef.current.pid ? {...p, x: dragRef.current.ox + dx, y: dragRef.current.oy + dy} : p
-      ));
-    };
-
-    const endDrag = () => { dragRef.current = null; };
-
-    const act = (fn) => setPieces(prev => prev.map(p => p.pid === sel ? fn(p) : p));
-
-    const TOOLBAR = [
-      {icon: "border-style-2", label: "Border", action: () => act(p => ({...p, border: !p.border}))},
-      {icon: "flip-horizontal", label: "Flip", action: () => act(p => ({...p, flip: !p.flip}))},
-      {
-        icon: "copy", label: "Duplicate", action: () => {
-          const src = pieces.find(p => p.pid === sel);
-          if (!src) return;
-          maxZRef.current += 1;
-          const newPid = Date.now();
-          setPieces(prev => [...prev, {...src, pid: newPid, x: src.x + 20, y: src.y + 20, z: maxZRef.current}]);
-          setSel(newPid);
-        }
-      },
-      {icon: "arrow-bar-to-down", label: "Back", action: () => act(p => ({...p, z: 0}))},
-      {icon: "trash", label: "Remove", action: () => { setPieces(prev => prev.filter(p => p.pid !== sel)); setSel(null); }},
-    ];
-
-    return (
-      <div style={{position: "fixed", inset: 0, background: "#fff", zIndex: 500, display: "flex", flexDirection: "column", userSelect: "none"}}>
-        <div style={{padding: "14px 20px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff"}}>
-          <button onClick={() => setShowCollage(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1}}>×</button>
-          <div style={{fontSize: 12, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: C.text}}>{o.name}</div>
-          <button onClick={() => setShowCollage(false)} style={{background: "transparent", fontSize: 13, fontWeight: 600, color: C.accent}}>Done</button>
-        </div>
-
-        <div
-          style={{flex: 1, position: "relative", background: "#f5f2ec", overflow: "hidden", touchAction: "none"}}
-          onClick={() => setSel(null)}
-        >
-          {pieces.map(p => (
-            <div
-              key={p.pid}
-              style={{
-                position: "absolute",
-                left: p.x, top: p.y,
-                width: p.w, height: p.h,
-                zIndex: p.z,
-                background: "#fff",
-                borderRadius: 6,
-                overflow: "hidden",
-                transform: p.flip ? "scaleX(-1)" : "none",
-                border: p.border ? `2.5px solid ${C.accent}` : "2.5px solid transparent",
-                boxShadow: p.pid === sel
-                  ? `0 0 0 2px ${C.accent}, 0 6px 20px rgba(0,0,0,0.18)`
-                  : "0 2px 12px rgba(0,0,0,0.10)",
-                cursor: "grab",
-                touchAction: "none",
-              }}
-              onPointerDown={e => startDrag(e, p.pid)}
-              onPointerMove={moveDrag}
-              onPointerUp={endDrag}
-              onClick={e => e.stopPropagation()}
-            >
-              {p.item.photo
-                ? <img src={p.item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
-                : <Placeholder item={p.item} size={p.w} />
-              }
-            </div>
-          ))}
-        </div>
-
-        {sel !== null ? (
-          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "10px 4px 36px", display: "flex", justifyContent: "space-around", flexShrink: 0}}>
-            {TOOLBAR.map(({icon, label, action}) => (
-              <button key={label} onClick={action} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "transparent", color: C.textMid, padding: "4px 10px"}}>
-                <i className={`ti ti-${icon}`} style={{fontSize: 22}} aria-hidden="true" />
-                <span style={{fontSize: 10}}>{label}</span>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div style={{padding: "12px 20px 36px", background: "#fff", borderTop: `0.5px solid ${C.border}`, textAlign: "center", fontSize: 11, color: C.textMuted, flexShrink: 0}}>
-            Tap an item to select · Drag to reposition
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const GhostModel = () => {
-    const o = ghostOutfit;
-    if (!o) return null;
-    const its = o.items;
-    const zoneOf = item => {
-      if (item.category === "Shoes") return "feet";
-      if (item.category === "Bottoms") return "lower";
-      if (item.category === "Tops" || item.category === "Outerwear" || item.category === "Activewear") return "torso";
-      if (item.category === "One Piece") return "full";
-      if (item.sub === "Hat" || item.sub === "Scarf" || item.sub === "Sunglasses") return "head";
-      if (item.sub === "Belt") return "waist";
-      return "side";
-    };
-    const zones = {head: [], torso: [], full: [], waist: [], lower: [], feet: [], side: []};
-    its.forEach(item => zones[zoneOf(item)].push(item));
-    const torsoItems = [...zones.full, ...zones.torso];
-
-    const Thumb = ({item, w = 62}) => (
-      <div style={{width: w, height: Math.round(w * 1.22), background: C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0, border: `1px solid ${C.border}`}}>
-        {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={w} />}
-      </div>
-    );
-
-    return (
-      <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.94)", zIndex: 400, display: "flex", flexDirection: "column"}} onClick={() => setShowGhostModel(false)}>
-        <div style={{width: "100%", maxWidth: 430, margin: "0 auto", height: "100%", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
-          <div style={{padding: "18px 20px 6px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0}}>
-            <button onClick={() => setShowGhostModel(false)} style={{background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: 22, lineHeight: 1}}>×</button>
-            <div style={{fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.9)", letterSpacing: "0.14em", textTransform: "uppercase"}}>{o.name}</div>
-            <div style={{width: 30}} />
-          </div>
-          <div style={{flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden"}}>
-            <svg width="120" height="340" viewBox="0 0 120 340" style={{position: "absolute", opacity: 0.15, pointerEvents: "none"}}>
-              <ellipse cx="60" cy="30" rx="18" ry="21" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <rect x="54" y="50" width="12" height="10" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M22 62 Q6 70 10 126 L34 126 L34 186 L86 186 L86 126 L110 126 Q114 70 98 62 Q80 56 60 56 Q40 56 22 62Z" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M22 70 Q8 88 10 136 L22 136 Q24 92 34 78" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M98 70 Q112 88 110 136 L98 136 Q96 92 86 78" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M34 186 Q28 206 30 246 L58 246 L58 186" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M86 186 Q92 206 90 246 L62 246 L62 186" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M30 246 Q28 284 30 318 L50 318 L52 246" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M90 246 Q92 284 90 318 L70 318 L68 246" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M30 316 Q22 322 20 328 L52 328 L52 316" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M90 316 Q98 322 100 328 L68 328 L68 316" fill="none" stroke="#fff" strokeWidth="1.5"/>
-            </svg>
-            <div style={{position: "relative", width: 340, height: 410, flexShrink: 0}}>
-              {zones.head.length > 0 && (
-                <div style={{position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5}}>
-                  {zones.head.map(item => <Thumb key={item.id} item={item} w={46} />)}
-                </div>
-              )}
-              {torsoItems.length > 0 && (
-                <div style={{position: "absolute", top: 62, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6}}>
-                  {torsoItems.map(item => <Thumb key={item.id} item={item} w={torsoItems.length > 2 ? 60 : 74} />)}
-                </div>
-              )}
-              {zones.waist.length > 0 && (
-                <div style={{position: "absolute", top: 178, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 4}}>
-                  {zones.waist.map(item => <Thumb key={item.id} item={item} w={38} />)}
-                </div>
-              )}
-              {zones.lower.length > 0 && (
-                <div style={{position: "absolute", top: 192, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6}}>
-                  {zones.lower.map(item => <Thumb key={item.id} item={item} w={68} />)}
-                </div>
-              )}
-              {zones.feet.length > 0 && (
-                <div style={{position: "absolute", top: 324, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5}}>
-                  {zones.feet.map(item => <Thumb key={item.id} item={item} w={54} />)}
-                </div>
-              )}
-              {zones.side.length > 0 && (
-                <div style={{position: "absolute", top: 110, right: 0, display: "flex", flexDirection: "column", gap: 6}}>
-                  {zones.side.map(item => <Thumb key={item.id} item={item} w={52} />)}
-                </div>
-              )}
-            </div>
-          </div>
-          <div style={{padding: "8px 20px 44px", textAlign: "center"}}>
-            <div style={{fontSize: 10, color: "rgba(255,255,255,0.28)", letterSpacing: "0.12em"}}>{its.length} PIECES</div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const CalendarScreen = () => {
-    const today = new Date();
-    const { year, month } = calMonth;
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const days = [];
-    for (let i = 0; i < firstDay; i++) days.push(null);
-    for (let d = 1; d <= daysInMonth; d++) days.push(d);
-    const isToday = d => d && today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
-    const dateKey = d => `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const outfitForDay = d => d && calOutfits[dateKey(d)] ? outfits.find(o => o.id === calOutfits[dateKey(d)]) : null;
-
-    const prevMonth = () => setCalMonth(p => { const d = new Date(p.year, p.month-1); return {year:d.getFullYear(),month:d.getMonth()}; });
-    const nextMonth = () => setCalMonth(p => { const d = new Date(p.year, p.month+1); return {year:d.getFullYear(),month:d.getMonth()}; });
-
-    return (
-      <div style={{paddingBottom:20}}>
-        <div style={{padding:"20px 20px 14px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-          <button onClick={prevMonth} style={{background:"transparent", fontSize:22, color:C.textMuted, lineHeight:1, padding:"4px 8px"}}>‹</button>
-          <div style={{fontSize:20, fontWeight:300}}>{MONTHS[month]} {year}</div>
-          <button onClick={nextMonth} style={{background:"transparent", fontSize:22, color:C.textMuted, lineHeight:1, padding:"4px 8px"}}>›</button>
-        </div>
-
-        <div style={{margin:"0 14px 16px"}}>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:6}}>
-            {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
-              <div key={d} style={{textAlign:"center", fontSize:10, color:C.textMuted, padding:"3px 0", letterSpacing:"0.04em"}}>{d}</div>
-            ))}
-          </div>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3}}>
-            {days.map((d, i) => {
-              const o = outfitForDay(d);
-              const today_ = isToday(d);
-              return (
-                <div key={i} onClick={() => { if (!d) return; setCalDay(dateKey(d)); setShowCalDay(true); }}
-                  style={{aspectRatio:"1", borderRadius:9, background: today_ ? C.accent : d ? C.surface : "transparent",
-                    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-                    cursor: d?"pointer":"default", border: d && !today_ ? `0.5px solid ${C.border}` : "none",
-                    gap:2, overflow:"hidden", position:"relative"}}>
-                  {d && <>
-                    {o?.items[0]?.photo && <img src={o.items[0].photo} style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:0.35}} />}
-                    <span style={{fontSize:13, color: today_?"#fff":C.text, fontWeight: today_?600:400, position:"relative", zIndex:1}}>{d}</span>
-                    {o && <div style={{width:5,height:5,borderRadius:"50%",background: today_?"rgba(255,255,255,0.9)":C.accent,position:"relative",zIndex:1}} />}
-                  </>}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div style={{margin:"0 14px"}}>
-          <Card>
-            <div style={{padding:"12px 16px", borderBottom:`0.5px solid ${C.border}`}}>
-              <div style={{fontSize:13, fontWeight:500}}>This Month</div>
-            </div>
-            <div style={{padding:"12px 16px"}}>
-              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:10}}>
-                <div style={{background:C.surface2, borderRadius:10, padding:"12px 14px"}}>
-                  <div style={{fontSize:11, color:C.textMuted, marginBottom:3}}>Outfits Logged</div>
-                  <div style={{fontSize:24, fontWeight:300}}>{Object.keys(calOutfits).filter(k=>k.startsWith(`${year}-${String(month+1).padStart(2,"0")}`)).length}</div>
-                </div>
-                <div style={{background:C.surface2, borderRadius:10, padding:"12px 14px"}}>
-                  <div style={{fontSize:11, color:C.textMuted, marginBottom:3}}>Total Outfits</div>
-                  <div style={{fontSize:24, fontWeight:300}}>{outfits.length}</div>
-                </div>
-              </div>
-            </div>
-            {outfits.length===0 && <div style={{padding:"0 16px 14px", fontSize:12, color:C.textMuted}}>Build outfits in the Closet tab, then tap a day to log them here.</div>}
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
-  const CalendarDaySheet = () => {
-    const o = calDay && calOutfits[calDay] ? outfits.find(x => x.id === calOutfits[calDay]) : null;
-    const dateStr = calDay ? new Date(calDay + "T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}) : "";
-    return (
-      <div style={{position:"fixed",inset:0,background:"rgba(10,8,6,0.55)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={()=>setShowCalDay(false)}>
-        <div style={{width:"100%",maxWidth:430,background:C.surface,borderRadius:"20px 20px 0 0",padding:"20px 20px 50px"}} onClick={e=>e.stopPropagation()}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-            <div>
-              <div style={{fontSize:15,fontWeight:500}}>{dateStr}</div>
-              {o&&<div style={{fontSize:11,color:C.accentMid,marginTop:2}}>{o.name}</div>}
-            </div>
-            <button onClick={()=>setShowCalDay(false)} style={{background:"transparent",color:C.textMuted,fontSize:20}}>×</button>
-          </div>
-          {o ? (
-            <>
-              <div style={{display:"flex",gap:6,marginBottom:16}}>
-                {o.items.slice(0,6).map(item=>(
-                  <div key={item.id} style={{width:54,height:66,background:"#fff",borderRadius:8,overflow:"hidden",border:`0.5px solid ${C.border}`,flexShrink:0}}>
-                    {item.photo?<img src={item.photo} style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<Placeholder item={item} size={54}/>}
-                  </div>
-                ))}
-              </div>
-              <button onClick={()=>{const n={...calOutfits};delete n[calDay];setCalOutfits(n);setShowCalDay(false);}} style={{width:"100%",padding:"11px",background:"transparent",border:`0.5px solid #e08080`,borderRadius:10,fontSize:13,color:"#c02020"}}>Remove outfit log</button>
-            </>
-          ) : (
-            <>
-              <div style={{fontSize:12,color:C.textMuted,marginBottom:outfits.length>0?14:0}}>No outfit logged for this day.</div>
-              {outfits.length>0 && <>
-                <div style={{fontSize:10,fontWeight:500,letterSpacing:"0.08em",color:C.textMuted,marginBottom:8}}>LOG AN OUTFIT</div>
-                {outfits.map((oo,i)=>(
-                  <div key={oo.id} onClick={()=>{setCalOutfits(p=>({...p,[calDay]:oo.id}));setShowCalDay(false);}}
-                    style={{display:"flex",gap:10,alignItems:"center",padding:"10px 0",borderBottom:i<outfits.length-1?`0.5px solid ${C.border}`:"none",cursor:"pointer"}}>
-                    <div style={{display:"flex",gap:4}}>
-                      {oo.items.slice(0,3).map(item=>(
-                        <div key={item.id} style={{width:38,height:46,background:"#fff",borderRadius:6,overflow:"hidden",border:`0.5px solid ${C.border}`}}>
-                          {item.photo?<img src={item.photo} style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<Placeholder item={item} size={38}/>}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:500}}>{oo.name}</div>
-                      <div style={{fontSize:11,color:C.textMuted}}>{oo.items.length} items</div>
-                    </div>
-                    <span style={{color:C.textMuted,fontSize:18}}>›</span>
-                  </div>
-                ))}
-              </>}
-              {outfits.length===0 && <div style={{fontSize:12,color:C.textMuted,marginTop:4}}>Build outfits in the Closet tab first.</div>}
-            </>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   const NAV = [
-    {id: "today", icon: "ti-home", label: "Today"},
+    {id: "today", icon: "ti-calendar-event", label: "Today"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
-    {id: "calendar", icon: "ti-calendar", label: "Calendar"},
+    {id: "_add", icon: "ti-plus", label: "", center: true},
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
     {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
   ];
@@ -1129,30 +744,28 @@ export default function App() {
         <div style={{paddingTop: 54, minHeight: "100vh"}}>
           {tab === "today" && <TodayScreen />}
           {tab === "closet" && <ClosetScreen />}
-          {tab === "calendar" && <CalendarScreen />}
           {tab === "style" && <StyleScreen />}
           {tab === "shop" && <ShopScreen />}
         </div>
 
         <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
-          {NAV.map(n => (
+          {NAV.map(n => n.center ? (
+            <button key={n.id} onClick={openAdd} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "6px 0 24px", background: "transparent"}}>
+              <div style={{width: 52, height: 52, background: C.accent, borderRadius: 26, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -22, boxShadow: "0 3px 14px rgba(30,58,47,0.38)"}}>
+                <i className="ti ti-plus" style={{fontSize: 26, color: "#fff"}} aria-hidden="true" />
+              </div>
+            </button>
+          ) : (
             <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
-              <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
-              <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
+              <i className={`ti ${n.icon}`} style={{fontSize: 22}} aria-hidden="true" />
+              <span style={{fontSize: 10, fontWeight: tab === n.id ? 500 : 400}}>{n.label}</span>
             </button>
           ))}
         </div>
 
-        <button onClick={openAdd} style={{position:"fixed", bottom:80, right:"calc(50% - 200px)", width:50, height:50, background:C.accent, borderRadius:25, display:"flex", alignItems:"center", justifyContent:"center", zIndex:99, boxShadow:"0 3px 14px rgba(30,58,47,0.4)"}}>
-          <i className="ti ti-plus" style={{fontSize:24, color:"#fff"}} aria-hidden="true" />
-        </button>
-
         {showAdd && <AddSheet />}
         {showClip && <ClipSheet />}
         {showOutfitBuilder && <OutfitBuilder />}
-        {showCollage && <OutfitCollage />}
-        {showGhostModel && <GhostModel />}
-        {showCalDay && <CalendarDaySheet />}
       </div>
     </>
   );
