@@ -1,4 +1,4 @@
-import {useState, useRef} from "react";
+import {useState, useRef, useEffect} from "react";
 
 const C = {
   bg: "#f0ebe1",
@@ -96,7 +96,9 @@ function DonutChart({segs, size = 140}) {
 }
 
 export default function App() {
-  const [items, setItems] = useState(SAMPLE);
+  const [items, setItems] = useState(() => {
+    try {const s = localStorage.getItem('closet-items'); return s ? JSON.parse(s) : SAMPLE;} catch {return SAMPLE;}
+  });
   const [tab, setTab] = useState("today");
   const [closetTab, setClosetTab] = useState("items");
   const [filterCat, setFilterCat] = useState("All");
@@ -107,9 +109,15 @@ export default function App() {
   const [showClip, setShowClip] = useState(false);
   const [clipUrl, setClipUrl] = useState("");
   const [clipStep, setClipStep] = useState(0);
-  const [outfits, setOutfits] = useState([]);
-  const [collections, setCollections] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [outfits, setOutfits] = useState(() => {
+    try {const s = localStorage.getItem('closet-outfits'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [collections, setCollections] = useState(() => {
+    try {const s = localStorage.getItem('closet-collections'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [wishlist, setWishlist] = useState(() => {
+    try {const s = localStorage.getItem('closet-wishlist'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
   const [collTab, setCollTab] = useState("Packing");
   const [showOutfitBuilder, setShowOutfitBuilder] = useState(false);
   const [outfitName, setOutfitName] = useState("");
@@ -118,10 +126,15 @@ export default function App() {
   const [collageOutfit, setCollageOutfit] = useState(null);
   const [showGhostModel, setShowGhostModel] = useState(false);
   const [ghostOutfit, setGhostOutfit] = useState(null);
-  const [calOutfits, setCalOutfits] = useState({});
+  const [calOutfits, setCalOutfits] = useState(() => {
+    try {const s = localStorage.getItem('closet-caloutfits'); return s ? JSON.parse(s) : {};} catch {return {};}
+  });
   const [showCalDay, setShowCalDay] = useState(false);
   const [calDay, setCalDay] = useState(null);
-  const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }));
+  const [calMonth, setCalMonth] = useState(() => ({year: new Date().getFullYear(), month: new Date().getMonth()}));
+  useEffect(() => {
+    localStorage.setItem('closet-items', JSON / stringify(items))''
+  }, [items]);
   const fileRef = useRef();
 
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
@@ -453,17 +466,17 @@ export default function App() {
               const pct = Math.round(count / items.length * 100);
               return (
                 <div key={cat.name} style={{marginBottom: 11}}>
-                  <div style={{display:"flex", justifyContent:"space-between", marginBottom:4}}>
-                    <span style={{fontSize:12, color:C.textMid}}>{cat.name}</span>
-                    <span style={{fontSize:12, color:C.textMuted}}>{count} &nbsp;({pct}%)</span>
+                  <div style={{display: "flex", justifyContent: "space-between", marginBottom: 4}}>
+                    <span style={{fontSize: 12, color: C.textMid}}>{cat.name}</span>
+                    <span style={{fontSize: 12, color: C.textMuted}}>{count} &nbsp;({pct}%)</span>
                   </div>
-                  <div style={{height:6, background:C.surface2, borderRadius:3, overflow:"hidden"}}>
-                    <div style={{height:"100%", width:`${pct}%`, background:C.accent, borderRadius:3, transition:"width 0.4s"}} />
+                  <div style={{height: 6, background: C.surface2, borderRadius: 3, overflow: "hidden"}}>
+                    <div style={{height: "100%", width: `${pct}%`, background: C.accent, borderRadius: 3, transition: "width 0.4s"}} />
                   </div>
                 </div>
               );
             })}
-            {items.length === 0 && <div style={{fontSize:12,color:C.textMuted}}>Add items to see composition.</div>}
+            {items.length === 0 && <div style={{fontSize: 12, color: C.textMuted}}>Add items to see composition.</div>}
           </div>
         </Card>
       </div>
@@ -815,7 +828,7 @@ export default function App() {
       ));
     };
 
-    const endDrag = () => { dragRef.current = null; };
+    const endDrag = () => {dragRef.current = null;};
 
     const act = (fn) => setPieces(prev => prev.map(p => p.pid === sel ? fn(p) : p));
 
@@ -833,7 +846,7 @@ export default function App() {
         }
       },
       {icon: "arrow-bar-to-down", label: "Back", action: () => act(p => ({...p, z: 0}))},
-      {icon: "trash", label: "Remove", action: () => { setPieces(prev => prev.filter(p => p.pid !== sel)); setSel(null); }},
+      {icon: "trash", label: "Remove", action: () => {setPieces(prev => prev.filter(p => p.pid !== sel)); setSel(null);}},
     ];
 
     return (
@@ -931,17 +944,17 @@ export default function App() {
           </div>
           <div style={{flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden"}}>
             <svg width="120" height="340" viewBox="0 0 120 340" style={{position: "absolute", opacity: 0.15, pointerEvents: "none"}}>
-              <ellipse cx="60" cy="30" rx="18" ry="21" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <rect x="54" y="50" width="12" height="10" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M22 62 Q6 70 10 126 L34 126 L34 186 L86 186 L86 126 L110 126 Q114 70 98 62 Q80 56 60 56 Q40 56 22 62Z" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M22 70 Q8 88 10 136 L22 136 Q24 92 34 78" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M98 70 Q112 88 110 136 L98 136 Q96 92 86 78" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M34 186 Q28 206 30 246 L58 246 L58 186" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M86 186 Q92 206 90 246 L62 246 L62 186" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M30 246 Q28 284 30 318 L50 318 L52 246" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M90 246 Q92 284 90 318 L70 318 L68 246" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M30 316 Q22 322 20 328 L52 328 L52 316" fill="none" stroke="#fff" strokeWidth="1.5"/>
-              <path d="M90 316 Q98 322 100 328 L68 328 L68 316" fill="none" stroke="#fff" strokeWidth="1.5"/>
+              <ellipse cx="60" cy="30" rx="18" ry="21" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <rect x="54" y="50" width="12" height="10" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M22 62 Q6 70 10 126 L34 126 L34 186 L86 186 L86 126 L110 126 Q114 70 98 62 Q80 56 60 56 Q40 56 22 62Z" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M22 70 Q8 88 10 136 L22 136 Q24 92 34 78" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M98 70 Q112 88 110 136 L98 136 Q96 92 86 78" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M34 186 Q28 206 30 246 L58 246 L58 186" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M86 186 Q92 206 90 246 L62 246 L62 186" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M30 246 Q28 284 30 318 L50 318 L52 246" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M90 246 Q92 284 90 318 L70 318 L68 246" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M30 316 Q22 322 20 328 L52 328 L52 316" fill="none" stroke="#fff" strokeWidth="1.5" />
+              <path d="M90 316 Q98 322 100 328 L68 328 L68 316" fill="none" stroke="#fff" strokeWidth="1.5" />
             </svg>
             <div style={{position: "relative", width: 340, height: 410, flexShrink: 0}}>
               {zones.head.length > 0 && (
@@ -984,50 +997,52 @@ export default function App() {
     );
   };
 
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const CalendarScreen = () => {
     const today = new Date();
-    const { year, month } = calMonth;
+    const {year, month} = calMonth;
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days = [];
     for (let i = 0; i < firstDay; i++) days.push(null);
     for (let d = 1; d <= daysInMonth; d++) days.push(d);
     const isToday = d => d && today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
-    const dateKey = d => `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const dateKey = d => `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const outfitForDay = d => d && calOutfits[dateKey(d)] ? outfits.find(o => o.id === calOutfits[dateKey(d)]) : null;
 
-    const prevMonth = () => setCalMonth(p => { const d = new Date(p.year, p.month-1); return {year:d.getFullYear(),month:d.getMonth()}; });
-    const nextMonth = () => setCalMonth(p => { const d = new Date(p.year, p.month+1); return {year:d.getFullYear(),month:d.getMonth()}; });
+    const prevMonth = () => setCalMonth(p => {const d = new Date(p.year, p.month - 1); return {year: d.getFullYear(), month: d.getMonth()};});
+    const nextMonth = () => setCalMonth(p => {const d = new Date(p.year, p.month + 1); return {year: d.getFullYear(), month: d.getMonth()};});
 
     return (
-      <div style={{paddingBottom:20}}>
-        <div style={{padding:"20px 20px 14px", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-          <button onClick={prevMonth} style={{background:"transparent", fontSize:22, color:C.textMuted, lineHeight:1, padding:"4px 8px"}}>‹</button>
-          <div style={{fontSize:20, fontWeight:300}}>{MONTHS[month]} {year}</div>
-          <button onClick={nextMonth} style={{background:"transparent", fontSize:22, color:C.textMuted, lineHeight:1, padding:"4px 8px"}}>›</button>
+      <div style={{paddingBottom: 20}}>
+        <div style={{padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+          <button onClick={prevMonth} style={{background: "transparent", fontSize: 22, color: C.textMuted, lineHeight: 1, padding: "4px 8px"}}>‹</button>
+          <div style={{fontSize: 20, fontWeight: 300}}>{MONTHS[month]} {year}</div>
+          <button onClick={nextMonth} style={{background: "transparent", fontSize: 22, color: C.textMuted, lineHeight: 1, padding: "4px 8px"}}>›</button>
         </div>
 
-        <div style={{margin:"0 14px 16px"}}>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(7,1fr)", marginBottom:6}}>
-            {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
-              <div key={d} style={{textAlign:"center", fontSize:10, color:C.textMuted, padding:"3px 0", letterSpacing:"0.04em"}}>{d}</div>
+        <div style={{margin: "0 14px 16px"}}>
+          <div style={{display: "grid", gridTemplateColumns: "repeat(7,1fr)", marginBottom: 6}}>
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
+              <div key={d} style={{textAlign: "center", fontSize: 10, color: C.textMuted, padding: "3px 0", letterSpacing: "0.04em"}}>{d}</div>
             ))}
           </div>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3}}>
+          <div style={{display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3}}>
             {days.map((d, i) => {
               const o = outfitForDay(d);
               const today_ = isToday(d);
               return (
-                <div key={i} onClick={() => { if (!d) return; setCalDay(dateKey(d)); setShowCalDay(true); }}
-                  style={{aspectRatio:"1", borderRadius:9, background: today_ ? C.accent : d ? C.surface : "transparent",
-                    display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-                    cursor: d?"pointer":"default", border: d && !today_ ? `0.5px solid ${C.border}` : "none",
-                    gap:2, overflow:"hidden", position:"relative"}}>
+                <div key={i} onClick={() => {if (!d) return; setCalDay(dateKey(d)); setShowCalDay(true);}}
+                  style={{
+                    aspectRatio: "1", borderRadius: 9, background: today_ ? C.accent : d ? C.surface : "transparent",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    cursor: d ? "pointer" : "default", border: d && !today_ ? `0.5px solid ${C.border}` : "none",
+                    gap: 2, overflow: "hidden", position: "relative"
+                  }}>
                   {d && <>
-                    {o?.items[0]?.photo && <img src={o.items[0].photo} style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",opacity:0.35}} />}
-                    <span style={{fontSize:13, color: today_?"#fff":C.text, fontWeight: today_?600:400, position:"relative", zIndex:1}}>{d}</span>
-                    {o && <div style={{width:5,height:5,borderRadius:"50%",background: today_?"rgba(255,255,255,0.9)":C.accent,position:"relative",zIndex:1}} />}
+                    {o?.items[0]?.photo && <img src={o.items[0].photo} style={{position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35}} />}
+                    <span style={{fontSize: 13, color: today_ ? "#fff" : C.text, fontWeight: today_ ? 600 : 400, position: "relative", zIndex: 1}}>{d}</span>
+                    {o && <div style={{width: 5, height: 5, borderRadius: "50%", background: today_ ? "rgba(255,255,255,0.9)" : C.accent, position: "relative", zIndex: 1}} />}
                   </>}
                 </div>
               );
@@ -1035,24 +1050,24 @@ export default function App() {
           </div>
         </div>
 
-        <div style={{margin:"0 14px"}}>
+        <div style={{margin: "0 14px"}}>
           <Card>
-            <div style={{padding:"12px 16px", borderBottom:`0.5px solid ${C.border}`}}>
-              <div style={{fontSize:13, fontWeight:500}}>This Month</div>
+            <div style={{padding: "12px 16px", borderBottom: `0.5px solid ${C.border}`}}>
+              <div style={{fontSize: 13, fontWeight: 500}}>This Month</div>
             </div>
-            <div style={{padding:"12px 16px"}}>
-              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:10}}>
-                <div style={{background:C.surface2, borderRadius:10, padding:"12px 14px"}}>
-                  <div style={{fontSize:11, color:C.textMuted, marginBottom:3}}>Outfits Logged</div>
-                  <div style={{fontSize:24, fontWeight:300}}>{Object.keys(calOutfits).filter(k=>k.startsWith(`${year}-${String(month+1).padStart(2,"0")}`)).length}</div>
+            <div style={{padding: "12px 16px"}}>
+              <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
+                <div style={{background: C.surface2, borderRadius: 10, padding: "12px 14px"}}>
+                  <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Outfits Logged</div>
+                  <div style={{fontSize: 24, fontWeight: 300}}>{Object.keys(calOutfits).filter(k => k.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`)).length}</div>
                 </div>
-                <div style={{background:C.surface2, borderRadius:10, padding:"12px 14px"}}>
-                  <div style={{fontSize:11, color:C.textMuted, marginBottom:3}}>Total Outfits</div>
-                  <div style={{fontSize:24, fontWeight:300}}>{outfits.length}</div>
+                <div style={{background: C.surface2, borderRadius: 10, padding: "12px 14px"}}>
+                  <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Total Outfits</div>
+                  <div style={{fontSize: 24, fontWeight: 300}}>{outfits.length}</div>
                 </div>
               </div>
             </div>
-            {outfits.length===0 && <div style={{padding:"0 16px 14px", fontSize:12, color:C.textMuted}}>Build outfits in the Closet tab, then tap a day to log them here.</div>}
+            {outfits.length === 0 && <div style={{padding: "0 16px 14px", fontSize: 12, color: C.textMuted}}>Build outfits in the Closet tab, then tap a day to log them here.</div>}
           </Card>
         </div>
       </div>
@@ -1061,52 +1076,52 @@ export default function App() {
 
   const CalendarDaySheet = () => {
     const o = calDay && calOutfits[calDay] ? outfits.find(x => x.id === calOutfits[calDay]) : null;
-    const dateStr = calDay ? new Date(calDay + "T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}) : "";
+    const dateStr = calDay ? new Date(calDay + "T12:00:00").toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"}) : "";
     return (
-      <div style={{position:"fixed",inset:0,background:"rgba(10,8,6,0.55)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"}} onClick={()=>setShowCalDay(false)}>
-        <div style={{width:"100%",maxWidth:430,background:C.surface,borderRadius:"20px 20px 0 0",padding:"20px 20px 50px"}} onClick={e=>e.stopPropagation()}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+      <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={() => setShowCalDay(false)}>
+        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px 50px"}} onClick={e => e.stopPropagation()}>
+          <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14}}>
             <div>
-              <div style={{fontSize:15,fontWeight:500}}>{dateStr}</div>
-              {o&&<div style={{fontSize:11,color:C.accentMid,marginTop:2}}>{o.name}</div>}
+              <div style={{fontSize: 15, fontWeight: 500}}>{dateStr}</div>
+              {o && <div style={{fontSize: 11, color: C.accentMid, marginTop: 2}}>{o.name}</div>}
             </div>
-            <button onClick={()=>setShowCalDay(false)} style={{background:"transparent",color:C.textMuted,fontSize:20}}>×</button>
+            <button onClick={() => setShowCalDay(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20}}>×</button>
           </div>
           {o ? (
             <>
-              <div style={{display:"flex",gap:6,marginBottom:16}}>
-                {o.items.slice(0,6).map(item=>(
-                  <div key={item.id} style={{width:54,height:66,background:"#fff",borderRadius:8,overflow:"hidden",border:`0.5px solid ${C.border}`,flexShrink:0}}>
-                    {item.photo?<img src={item.photo} style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<Placeholder item={item} size={54}/>}
+              <div style={{display: "flex", gap: 6, marginBottom: 16}}>
+                {o.items.slice(0, 6).map(item => (
+                  <div key={item.id} style={{width: 54, height: 66, background: "#fff", borderRadius: 8, overflow: "hidden", border: `0.5px solid ${C.border}`, flexShrink: 0}}>
+                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={54} />}
                   </div>
                 ))}
               </div>
-              <button onClick={()=>{const n={...calOutfits};delete n[calDay];setCalOutfits(n);setShowCalDay(false);}} style={{width:"100%",padding:"11px",background:"transparent",border:`0.5px solid #e08080`,borderRadius:10,fontSize:13,color:"#c02020"}}>Remove outfit log</button>
+              <button onClick={() => {const n = {...calOutfits}; delete n[calDay]; setCalOutfits(n); setShowCalDay(false);}} style={{width: "100%", padding: "11px", background: "transparent", border: `0.5px solid #e08080`, borderRadius: 10, fontSize: 13, color: "#c02020"}}>Remove outfit log</button>
             </>
           ) : (
             <>
-              <div style={{fontSize:12,color:C.textMuted,marginBottom:outfits.length>0?14:0}}>No outfit logged for this day.</div>
-              {outfits.length>0 && <>
-                <div style={{fontSize:10,fontWeight:500,letterSpacing:"0.08em",color:C.textMuted,marginBottom:8}}>LOG AN OUTFIT</div>
-                {outfits.map((oo,i)=>(
-                  <div key={oo.id} onClick={()=>{setCalOutfits(p=>({...p,[calDay]:oo.id}));setShowCalDay(false);}}
-                    style={{display:"flex",gap:10,alignItems:"center",padding:"10px 0",borderBottom:i<outfits.length-1?`0.5px solid ${C.border}`:"none",cursor:"pointer"}}>
-                    <div style={{display:"flex",gap:4}}>
-                      {oo.items.slice(0,3).map(item=>(
-                        <div key={item.id} style={{width:38,height:46,background:"#fff",borderRadius:6,overflow:"hidden",border:`0.5px solid ${C.border}`}}>
-                          {item.photo?<img src={item.photo} style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<Placeholder item={item} size={38}/>}
+              <div style={{fontSize: 12, color: C.textMuted, marginBottom: outfits.length > 0 ? 14 : 0}}>No outfit logged for this day.</div>
+              {outfits.length > 0 && <>
+                <div style={{fontSize: 10, fontWeight: 500, letterSpacing: "0.08em", color: C.textMuted, marginBottom: 8}}>LOG AN OUTFIT</div>
+                {outfits.map((oo, i) => (
+                  <div key={oo.id} onClick={() => {setCalOutfits(p => ({...p, [calDay]: oo.id})); setShowCalDay(false);}}
+                    style={{display: "flex", gap: 10, alignItems: "center", padding: "10px 0", borderBottom: i < outfits.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
+                    <div style={{display: "flex", gap: 4}}>
+                      {oo.items.slice(0, 3).map(item => (
+                        <div key={item.id} style={{width: 38, height: 46, background: "#fff", borderRadius: 6, overflow: "hidden", border: `0.5px solid ${C.border}`}}>
+                          {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={38} />}
                         </div>
                       ))}
                     </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:500}}>{oo.name}</div>
-                      <div style={{fontSize:11,color:C.textMuted}}>{oo.items.length} items</div>
+                    <div style={{flex: 1}}>
+                      <div style={{fontSize: 13, fontWeight: 500}}>{oo.name}</div>
+                      <div style={{fontSize: 11, color: C.textMuted}}>{oo.items.length} items</div>
                     </div>
-                    <span style={{color:C.textMuted,fontSize:18}}>›</span>
+                    <span style={{color: C.textMuted, fontSize: 18}}>›</span>
                   </div>
                 ))}
               </>}
-              {outfits.length===0 && <div style={{fontSize:12,color:C.textMuted,marginTop:4}}>Build outfits in the Closet tab first.</div>}
+              {outfits.length === 0 && <div style={{fontSize: 12, color: C.textMuted, marginTop: 4}}>Build outfits in the Closet tab first.</div>}
             </>
           )}
         </div>
@@ -1143,8 +1158,8 @@ export default function App() {
           ))}
         </div>
 
-        <button onClick={openAdd} style={{position:"fixed", bottom:80, right:"calc(50% - 200px)", width:50, height:50, background:C.accent, borderRadius:25, display:"flex", alignItems:"center", justifyContent:"center", zIndex:99, boxShadow:"0 3px 14px rgba(30,58,47,0.4)"}}>
-          <i className="ti ti-plus" style={{fontSize:24, color:"#fff"}} aria-hidden="true" />
+        <button onClick={openAdd} style={{position: "fixed", bottom: 80, right: "calc(50% - 200px)", width: 50, height: 50, background: C.accent, borderRadius: 25, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99, boxShadow: "0 3px 14px rgba(30,58,47,0.4)"}}>
+          <i className="ti ti-plus" style={{fontSize: 24, color: "#fff"}} aria-hidden="true" />
         </button>
 
         {showAdd && <AddSheet />}
