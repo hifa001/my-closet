@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from "react";
+import {useState, useRef} from "react";
 
 const C = {
   bg: "#f0ebe1",
@@ -96,9 +96,7 @@ function DonutChart({segs, size = 140}) {
 }
 
 export default function App() {
-  const [items, setItems] = useState(() => {
-    try {const s = localStorage.getItem('closet-items'); return s ? JSON.parse(s) : SAMPLE;} catch {return SAMPLE;}
-  });
+  const [items, setItems] = useState(SAMPLE);
   const [tab, setTab] = useState("today");
   const [closetTab, setClosetTab] = useState("items");
   const [filterCat, setFilterCat] = useState("All");
@@ -109,15 +107,9 @@ export default function App() {
   const [showClip, setShowClip] = useState(false);
   const [clipUrl, setClipUrl] = useState("");
   const [clipStep, setClipStep] = useState(0);
-  const [outfits, setOutfits] = useState(() => {
-    try {const s = localStorage.getItem('closet-outfits'); return s ? JSON.parse(s) : [];} catch {return [];}
-  });
-  const [collections, setCollections] = useState(() => {
-    try {const s = localStorage.getItem('closet-collections'); return s ? JSON.parse(s) : [];} catch {return [];}
-  });
-  const [wishlist, setWishlist] = useState(() => {
-    try {const s = localStorage.getItem('closet-wishlist'); return s ? JSON.parse(s) : [];} catch {return [];}
-  });
+  const [outfits, setOutfits] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [collTab, setCollTab] = useState("Packing");
   const [showOutfitBuilder, setShowOutfitBuilder] = useState(false);
   const [outfitName, setOutfitName] = useState("");
@@ -126,33 +118,23 @@ export default function App() {
   const [collageOutfit, setCollageOutfit] = useState(null);
   const [showGhostModel, setShowGhostModel] = useState(false);
   const [ghostOutfit, setGhostOutfit] = useState(null);
-  const [calOutfits, setCalOutfits] = useState(() => {
-    try {const s = localStorage.getItem('closet-caloutfits'); return s ? JSON.parse(s) : {};} catch {return {};}
-  });
+  const [calOutfits, setCalOutfits] = useState({});
   const [showCalDay, setShowCalDay] = useState(false);
   const [calDay, setCalDay] = useState(null);
   const [calMonth, setCalMonth] = useState(() => ({year: new Date().getFullYear(), month: new Date().getMonth()}));
-  useEffect(() => {
-    localStorage.setItem('closet-items', JSON.stringify(items));
-  }, [items]);
-
-  useEffect(() => {
-    localStorage.setItem('closet-outfits', JSON.stringify(outfits));
-  }, [outfits]);
-
-  useEffect(() => {
-    localStorage.setItem('closet-collections', JSON.stringify(collections));
-  }, [collections]);
-
-  useEffect(() => {
-    localStorage.setItem('closet-wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
-
-  useEffect(() => {
-    localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
-  }, [calOutfits]);
   const fileRef = useRef();
-
+  const [clipMeta, setClipMeta] = useState(null);
+  const [boards, setBoards] = useState([
+    {id: 1, name: "Summer", cover: null},
+    {id: 2, name: "Workwear", cover: null},
+    {id: 3, name: "Wishlist", cover: null},
+    {id: 4, name: "Inspo", cover: null},
+  ]);
+  const [savedItems, setSavedItems] = useState([]);
+  const [discoverTab, setDiscoverTab] = useState("boards");
+  const [viewBoard, setViewBoard] = useState(null);
+  const [savedFilter, setSavedFilter] = useState(null);
+  const [discoverSearch, setDiscoverSearch] = useState("");
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
 
@@ -340,7 +322,13 @@ export default function App() {
 
       {closetTab === "outfits" && (
         <div style={{padding: "16px"}}>
-          <button onClick={() => setShowOutfitBuilder(true)} style={{width: "100%", padding: "12px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 13, fontWeight: 500, marginBottom: 14}}>+ Build New Outfit</button>
+          <div style={{display: "flex", gap: 8, marginBottom: 14}}>
+            <button onClick={() => setShowOutfitBuilder(true)} style={{flex: 1, padding: "12px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 13, fontWeight: 500}}>+ Build New Outfit</button>
+            <button onClick={() => {setCollageOutfit({name: "New Board", items: []}); setShowCollage(true);}} style={{padding: "12px 14px", background: C.surface, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 13, fontWeight: 500, display: "flex", alignItems: "center", gap: 5}}>
+              <i className="ti ti-layout-collage" style={{fontSize: 15}} aria-hidden="true" />
+              Board
+            </button>
+          </div>
           {outfits.length === 0
             ? <div style={{textAlign: "center", padding: "30px", color: C.textMuted, fontSize: 13}}>No outfits yet — build your first look!</div>
             : outfits.map(o => (
@@ -361,6 +349,24 @@ export default function App() {
                   <button onClick={() => {setGhostOutfit(o); setShowGhostModel(true);}} style={{flex: 1, padding: "7px 10px", background: C.surface2, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
                     <i className="ti ti-man" style={{fontSize: 13}} aria-hidden="true" />
                     Ghost Model
+                  </button>
+                  <button onClick={() => {
+                    setForm({
+                      ...EMPTY,
+                      url: clipUrl,
+                      name: clipMeta?.title?.slice(0, 40) || "",
+                      brand: clipMeta?.brand || "",
+                      price: clipMeta?.price || "",
+                      photo: clipMeta?.image || null,
+                    });
+                    setShowClip(false);
+                    setClipUrl("");
+                    setClipStep(0);
+                    setClipMeta(null);
+                    setShowAdd(true);
+                  }} style={{flex: 1, padding: "7px 10px", background: C.surface2, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
+                    <i className="ti ti-plus" style={{fontSize: 13}} aria-hidden="true" />
+                    Add
                   </button>
                 </div>
               </div>
@@ -520,52 +526,179 @@ export default function App() {
     </div>
   );
 
-  const ShopScreen = () => (
-    <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-        <div style={{fontSize: 24, fontWeight: 300}}>Shopping</div>
-        <button style={{fontSize: 13, color: C.accentMid, background: "transparent"}}>Edit</button>
-      </div>
-
-      <div style={{margin: "0 16px 6px"}}>
-        <button onClick={() => setShowClip(true)} style={{width: "100%", background: "#1c1c1c", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 16, border: "none", cursor: "pointer"}}>
-          <div style={{width: 54, height: 54, border: "2px dashed rgba(255,255,255,0.3)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0}}>
-            <i className="ti ti-scissors" style={{fontSize: 24, color: "rgba(255,255,255,0.65)"}} aria-hidden="true" />
-          </div>
-          <div style={{textAlign: "left"}}>
-            <div style={{fontSize: 15, fontWeight: 500, color: "#fff", letterSpacing: "0.05em"}}>CLIP FROM WEB</div>
-            <div style={{fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 3}}>Save images from websites with the clipper tool</div>
-          </div>
-        </button>
-      </div>
-      <div style={{textAlign: "center", fontSize: 12, color: C.textMuted, padding: "6px 0 14px"}}>Save images from websites with the clipper tool</div>
-
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <div style={{padding: "13px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{fontSize: 14, fontWeight: 500}}>Wish List</div>
-            <div style={{display: "flex", alignItems: "center", gap: 8, color: C.textMuted}}>
-              <span style={{fontSize: 13}}>{wishlist.length}</span>
-              <span style={{fontSize: 18}}>›</span>
-            </div>
-          </div>
-          <div style={{padding: "10px 16px", fontSize: 12, color: C.textMuted}}>Tap the star while clipping to save a wish list item.</div>
-        </Card>
-      </div>
-
-      <div style={{padding: "0 16px"}}>
-        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10}}>Bookmarks</div>
-        <Card>
-          {BOOKMARKS.map((b, i) => (
-            <div key={b} style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 16px", borderBottom: i < BOOKMARKS.length - 1 ? `0.5px solid ${C.border}` : "none"}}>
-              <span style={{fontSize: 14}}>{b}</span>
-              <span style={{color: C.textMuted, fontSize: 18}}>›</span>
-            </div>
-          ))}
-        </Card>
+  const SavedCard = ({s, onOwn, onRemove}) => (
+    <div style={{background: C.surface, borderRadius: 12, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 10}}>
+      {s.image
+        ? <img src={s.image} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover"}} />
+        : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-photo" style={{fontSize: 28, color: C.border}} aria-hidden="true" /></div>
+      }
+      <div style={{padding: "8px 10px"}}>
+        {s.brand && <div style={{fontSize: 10, color: C.textMuted, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em"}}>{s.brand}</div>}
+        {s.name && <div style={{fontSize: 12, fontWeight: 500, marginTop: 2, lineHeight: 1.3}}>{s.name}</div>}
+        {s.price && <div style={{fontSize: 12, color: C.accentMid, marginTop: 2}}>${s.price}</div>}
+        <div style={{display: "flex", gap: 5, marginTop: 8}}>
+          <button onClick={onOwn} style={{flex: 1, padding: "5px 6px", background: C.accent, color: "#fff", borderRadius: 7, fontSize: 10, fontWeight: 500}}>I own this</button>
+          {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" style={{display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: C.surface2, borderRadius: 7, border: `0.5px solid ${C.border}`}}>
+            <i className="ti ti-external-link" style={{fontSize: 13, color: C.textMid}} aria-hidden="true" />
+          </a>}
+          <button onClick={onRemove} style={{display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: C.surface2, borderRadius: 7, border: `0.5px solid ${C.border}`}}>
+            <i className="ti ti-x" style={{fontSize: 11, color: C.textMuted}} aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </div>
   );
+
+  const ownThis = (s) => {
+    setForm({...EMPTY, photo: s.image || null, brand: s.brand || "", name: s.name || "", price: s.price || "", url: s.url || ""});
+    setEditItem(null);
+    setShowAdd(true);
+  };
+
+  const MasonryGrid = ({items: list}) => {
+    const col0 = list.filter((_, i) => i % 2 === 0);
+    const col1 = list.filter((_, i) => i % 2 === 1);
+    return (
+      <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "start"}}>
+        <div>{col0.map(s => <SavedCard key={s.id} s={s} onOwn={() => ownThis(s)} onRemove={() => setSavedItems(p => p.filter(x => x.id !== s.id))} />)}</div>
+        <div>{col1.map(s => <SavedCard key={s.id} s={s} onOwn={() => ownThis(s)} onRemove={() => setSavedItems(p => p.filter(x => x.id !== s.id))} />)}</div>
+      </div>
+    );
+  };
+
+  const BoardDetailView = () => {
+    if (!viewBoard) return null;
+    const bItems = savedItems.filter(s => s.boardId === viewBoard.id);
+    return (
+      <div style={{position: "fixed", inset: 0, background: C.bg, zIndex: 400, display: "flex", flexDirection: "column"}}>
+        <div style={{padding: "54px 16px 14px", display: "flex", alignItems: "center", gap: 10, background: C.surface, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0}}>
+          <button onClick={() => setViewBoard(null)} style={{background: "transparent", color: C.textMid, fontSize: 22, lineHeight: 1}}>←</button>
+          <div style={{flex: 1, fontSize: 18, fontWeight: 400}}>{viewBoard.name}</div>
+          <span style={{fontSize: 12, color: C.textMuted}}>{bItems.length} items</span>
+          <button onClick={() => {setViewBoard(null); setShowClip(true);}} style={{padding: "7px 12px", background: C.accent, color: "#fff", borderRadius: 8, fontSize: 12, fontWeight: 500}}>+ Add</button>
+        </div>
+        <div style={{flex: 1, overflowY: "auto", padding: "12px 12px 80px"}}>
+          {bItems.length === 0
+            ? <div style={{textAlign: "center", padding: "60px 20px", color: C.textMuted}}>
+              <i className="ti ti-photo-off" style={{fontSize: 36, display: "block", marginBottom: 10, opacity: 0.3}} aria-hidden="true" />
+              <div style={{fontSize: 13}}>This board is empty</div>
+              <div style={{fontSize: 12, marginTop: 6, opacity: 0.7}}>Clip items from the web to fill it</div>
+            </div>
+            : <MasonryGrid items={bItems} />
+          }
+        </div>
+      </div>
+    );
+  };
+
+  const DiscoverScreen = () => {
+    const DTABS = [{id: "boards", label: "Boards"}, {id: "saved", label: "Saved"}, {id: "search", label: "Search"}];
+    const displayed = savedFilter ? savedItems.filter(s => s.boardId === savedFilter) : savedItems;
+    const searchResults = discoverSearch
+      ? savedItems.filter(s => [s.brand, s.name].some(v => (v || "").toLowerCase().includes(discoverSearch.toLowerCase())))
+      : [];
+
+    return (
+      <div style={{paddingBottom: 20}}>
+        <div style={{padding: "20px 20px 0"}}>
+          <div style={{fontSize: 24, fontWeight: 300, marginBottom: 16}}>Discover</div>
+          <div style={{display: "flex", borderBottom: `0.5px solid ${C.border}`, marginBottom: 16}}>
+            {DTABS.map(t => (
+              <button key={t.id} onClick={() => setDiscoverTab(t.id)} style={{flex: 1, padding: "10px 4px", background: "transparent", color: discoverTab === t.id ? C.text : C.textMuted, fontSize: 13, fontWeight: discoverTab === t.id ? 500 : 400, borderBottom: discoverTab === t.id ? `2px solid ${C.accent}` : "2px solid transparent"}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Boards ── */}
+        {discoverTab === "boards" && (
+          <div style={{padding: "0 16px"}}>
+            <button onClick={() => {
+              const n = prompt("Board name:");
+              if (n) setBoards(p => [...p, {id: Date.now(), name: n, cover: null}]);
+            }} style={{width: "100%", padding: "12px", background: "transparent", border: `1px dashed ${C.borderMed}`, borderRadius: 12, color: C.textMuted, fontSize: 13, marginBottom: 14}}>
+              + New Board
+            </button>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
+              {boards.map(b => {
+                const bItems = savedItems.filter(s => s.boardId === b.id);
+                const cover = bItems.find(s => s.image)?.image || b.cover;
+                return (
+                  <div key={b.id} onClick={() => setViewBoard(b)} style={{borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`, position: "relative", aspectRatio: "4/5", background: C.surface}}>
+                    {cover
+                      ? <img src={cover} style={{width: "100%", height: "100%", objectFit: "cover"}} />
+                      : <div style={{width: "100%", height: "100%", background: `linear-gradient(135deg, ${C.surface2} 0%, ${C.bg} 100%)`, display: "flex", alignItems: "center", justifyContent: "center"}}>
+                        <i className="ti ti-layout-masonry" style={{fontSize: 32, color: C.borderMed}} aria-hidden="true" />
+                      </div>
+                    }
+                    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "28px 10px 10px", background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)"}}>
+                      <div style={{fontSize: 13, fontWeight: 500, color: "#fff"}}>{b.name}</div>
+                      <div style={{fontSize: 11, color: "rgba(255,255,255,0.6)"}}>{bItems.length} items</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Saved ── */}
+        {discoverTab === "saved" && (
+          <div style={{padding: "0 16px"}}>
+            <div style={{display: "flex", gap: 6, overflowX: "auto", paddingBottom: 10, marginBottom: 6}}>
+              <button onClick={() => setSavedFilter(null)} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: savedFilter === null ? C.accent : C.surface, color: savedFilter === null ? "#fff" : C.textMid, fontSize: 11, border: `0.5px solid ${savedFilter === null ? C.accent : C.border}`}}>All</button>
+              {boards.map(b => (
+                <button key={b.id} onClick={() => setSavedFilter(b.id)} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: savedFilter === b.id ? C.accent : C.surface, color: savedFilter === b.id ? "#fff" : C.textMid, fontSize: 11, border: `0.5px solid ${savedFilter === b.id ? C.accent : C.border}`}}>
+                  {b.name}
+                </button>
+              ))}
+            </div>
+            {displayed.length === 0
+              ? <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted}}>
+                <i className="ti ti-bookmark" style={{fontSize: 36, display: "block", marginBottom: 10, opacity: 0.3}} aria-hidden="true" />
+                <div style={{fontSize: 13}}>No saved items yet</div>
+                <div style={{fontSize: 12, marginTop: 6, opacity: 0.7}}>Clip items from the web to save them here</div>
+              </div>
+              : <MasonryGrid items={displayed} />
+            }
+          </div>
+        )}
+
+        {/* ── Search ── */}
+        {discoverTab === "search" && (
+          <div style={{padding: "0 16px"}}>
+            <input value={discoverSearch} onChange={e => setDiscoverSearch(e.target.value)} placeholder="Search saved items, brand, style…" style={{marginBottom: 14}} />
+            {discoverSearch ? (
+              searchResults.length > 0
+                ? <>
+                  <div style={{fontSize: 12, color: C.textMuted, marginBottom: 10}}>{searchResults.length} saved item{searchResults.length > 1 ? "s" : ""}</div>
+                  <MasonryGrid items={searchResults} />
+                </>
+                : <div style={{textAlign: "center", padding: "20px 0"}}>
+                  <div style={{fontSize: 13, color: C.textMuted, marginBottom: 16}}>Nothing saved — try the web</div>
+                  <a href={`https://www.google.com/search?q=${encodeURIComponent(discoverSearch + " clothing")}`} target="_blank" rel="noopener noreferrer" style={{display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 18px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 500, textDecoration: "none"}}>
+                    <i className="ti ti-world-search" style={{fontSize: 15}} aria-hidden="true" />
+                    Search the web
+                  </a>
+                </div>
+            ) : (
+              <>
+                <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10}}>Explore brands</div>
+                <div style={{display: "flex", flexWrap: "wrap", gap: 8}}>
+                  {["Ganni", "Toteme", "Reformation", "Kotn", "Arket", "Sézane", "& Other Stories", "Mango"].map(b => (
+                    <button key={b} onClick={() => setDiscoverSearch(b)} style={{padding: "6px 12px", background: C.surface, border: `0.5px solid ${C.border}`, borderRadius: 20, fontSize: 12, color: C.textMid}}>
+                      {b}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // ── Add/Edit sheet ────────────────────────────────────────────────────
   const AddSheet = () => (
@@ -711,18 +844,33 @@ export default function App() {
     </div>
   );
 
+  const closeClip = () => {setShowClip(false); setClipUrl(""); setClipStep(0); setClipMeta(null);};
+
   const ClipSheet = () => (
-    <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={() => {setShowClip(false); setClipUrl(""); setClipStep(0)}}>
-      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "24px 20px 50px"}} onClick={e => e.stopPropagation()}>
-        <div style={{display: "flex", alignItems: "center", gap: 10, marginBottom: 4}}>
-          <i className="ti ti-scissors" style={{fontSize: 22, color: C.accent}} aria-hidden="true" />
-          <div style={{fontSize: 18, fontWeight: 500}}>Clip from Web</div>
-        </div>
-        <div style={{fontSize: 12, color: C.textMuted, marginBottom: 20}}>Save any clothing item from the internet to your closet</div>
+    <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={closeClip}>
+      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "24px 20px 50px", maxHeight: "85vh", overflowY: "auto"}} onClick={e => e.stopPropagation()}>
+        {clipStep !== 3 && (
+          <>
+            <div style={{display: "flex", alignItems: "center", gap: 10, marginBottom: 4}}>
+              <i className="ti ti-scissors" style={{fontSize: 22, color: C.accent}} aria-hidden="true" />
+              <div style={{fontSize: 18, fontWeight: 500}}>Clip from Web</div>
+            </div>
+            <div style={{fontSize: 12, color: C.textMuted, marginBottom: 20}}>Save any item from the internet to a board or your closet</div>
+          </>
+        )}
 
         {clipStep === 0 && <>
           <input value={clipUrl} onChange={e => setClipUrl(e.target.value)} placeholder="Paste product URL here…" style={{marginBottom: 12}} />
-          <button onClick={() => {if (clipUrl) {setClipStep(1); setTimeout(() => setClipStep(2), 1600)} }} style={{width: "100%", padding: "13px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500}}>
+          <button onClick={async () => {
+            if (!clipUrl) return;
+            setClipStep(1);
+            try {
+              const res = await fetch(`/api/clip?url=${encodeURIComponent(clipUrl)}`);
+              const data = await res.json();
+              setClipMeta(data);
+            } catch {}
+            setClipStep(2);
+          }} style={{width: "100%", padding: "13px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500}}>
             Fetch Item
           </button>
         </>}
@@ -736,15 +884,57 @@ export default function App() {
         )}
 
         {clipStep === 2 && <>
-          <div style={{background: C.surface2, borderRadius: 10, padding: "12px 14px", marginBottom: 14}}>
-            <div style={{fontSize: 11, color: C.accentMid, marginBottom: 3}}>Detected from: {(clipUrl.replace(/https?:\/\//, "").split("/")[0]) || "URL"}</div>
-            <div style={{fontSize: 13, fontWeight: 500}}>Item ready to add — review and confirm details</div>
+          <div style={{background: C.surface2, borderRadius: 10, padding: "12px 14px", marginBottom: 16}}>
+            <div style={{fontSize: 11, color: C.accentMid, marginBottom: 6}}>{clipUrl.replace(/https?:\/\//, "").split("/")[0]}</div>
+            {clipMeta?.image && <img src={clipMeta.image} style={{width: "100%", height: 160, objectFit: "contain", borderRadius: 8, marginBottom: 8, background: "#fff"}} />}
+            <div style={{fontSize: 13, fontWeight: 500}}>{clipMeta?.title || "Item detected"}</div>
+            {clipMeta?.price && <div style={{fontSize: 12, color: C.textMuted, marginTop: 3}}>${clipMeta.price}</div>}
           </div>
-          <button onClick={() => {setForm({...EMPTY, url: clipUrl}); setShowClip(false); setClipUrl(""); setClipStep(0); setShowAdd(true)}} style={{width: "100%", padding: "13px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500, marginBottom: 8}}>
-            Continue Adding Item
+          <button onClick={() => setClipStep(3)} style={{width: "100%", padding: "13px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500, marginBottom: 8}}>
+            Save to Board →
           </button>
-          <button onClick={() => {setWishlist(p => [...p, {id: Date.now(), url: clipUrl, name: "Clipped item"}]); setShowClip(false); setClipUrl(""); setClipStep(0)}} style={{width: "100%", padding: "13px", background: "transparent", border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 14, color: C.textMid}}>
-            ⭐  Save to Wish List instead
+          <button onClick={() => {
+            setForm({...EMPTY, photo: clipMeta?.image || null, name: clipMeta?.title || "", price: clipMeta?.price || "", url: clipUrl});
+            setEditItem(null);
+            setShowAdd(true);
+            closeClip();
+          }} style={{width: "100%", padding: "13px", background: C.surface2, color: C.text, border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 14, fontWeight: 500}}>
+            Add to Closet
+          </button>
+        </>}
+
+        {clipStep === 3 && <>
+          <div style={{display: "flex", alignItems: "center", gap: 10, marginBottom: 4}}>
+            <button onClick={() => setClipStep(2)} style={{background: "transparent", color: C.textMid, fontSize: 20, lineHeight: 1}}>←</button>
+            <div style={{fontSize: 18, fontWeight: 500}}>Save to Board</div>
+          </div>
+          <div style={{fontSize: 12, color: C.textMuted, marginBottom: 16}}>Choose where to save this item</div>
+          {boards.map(b => (
+            <button key={b.id} onClick={() => {
+              const img = clipMeta?.image || null;
+              const newSaved = {id: Date.now(), image: img, url: clipUrl, brand: "", name: clipMeta?.title || "", price: clipMeta?.price || "", boardId: b.id, dateAdded: Date.now()};
+              setSavedItems(p => [...p, newSaved]);
+              if (img) setBoards(prev => prev.map(bd => bd.id === b.id && !bd.cover ? {...bd, cover: img} : bd));
+              closeClip();
+              setTab("discover");
+              setDiscoverTab("boards");
+            }} style={{width: "100%", padding: "13px 16px", background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 14, textAlign: "left", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+              <span>{b.name}</span>
+              <span style={{fontSize: 12, color: C.textMuted}}>{savedItems.filter(s => s.boardId === b.id).length} items</span>
+            </button>
+          ))}
+          <button onClick={() => {
+            const n = prompt("New board name:");
+            if (!n) return;
+            const bid = Date.now();
+            const img = clipMeta?.image || null;
+            setBoards(p => [...p, {id: bid, name: n, cover: img}]);
+            setSavedItems(p => [...p, {id: Date.now() + 1, image: img, url: clipUrl, brand: "", name: clipMeta?.title || "", price: clipMeta?.price || "", boardId: bid, dateAdded: Date.now()}]);
+            closeClip();
+            setTab("discover");
+            setDiscoverTab("boards");
+          }} style={{width: "100%", padding: "12px", background: "transparent", border: `1px dashed ${C.borderMed}`, borderRadius: 12, color: C.textMuted, fontSize: 13}}>
+            + Create New Board
           </button>
         </>}
       </div>
@@ -804,123 +994,216 @@ export default function App() {
   const OutfitCollage = () => {
     const o = collageOutfit;
 
-    // All hooks before any conditional return (Rules of Hooks)
-    const [pieces, setPieces] = useState(() =>
-      o ? o.items.map((item, i) => ({
-        pid: i,
-        item,
-        x: 24 + (i % 2) * 168,
-        y: 24 + Math.floor(i / 2) * 210,
-        w: 148,
-        h: 182,
-        flip: false,
-        border: false,
-        z: i + 1,
-      })) : []
-    );
+    // Pinterest-style staggered initial placement
+    const initPieces = (its) => its.map((item, i) => {
+      const WIDTHS = [148, 160, 138, 155, 145, 152];
+      const HEIGHTS = [190, 165, 205, 175, 195, 158];
+      const w = WIDTHS[i % WIDTHS.length];
+      const h = HEIGHTS[i % HEIGHTS.length];
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      return {
+        pid: i, item,
+        x: 14 + col * 176 + (row % 2 === 1 ? 10 : 0),
+        y: 14 + row * (h * 0.55) - (col === 1 ? 28 : 0),
+        w, h,
+        flip: false, border: false, z: i + 1,
+      };
+    });
+
+    const [pieces, setPieces] = useState(() => o ? initPieces(o.items) : []);
     const [sel, setSel] = useState(null);
+    const [bgColor, setBgColor] = useState("#f5f2ec");
+    const [showPicker, setShowPicker] = useState(false);
     const dragRef = useRef(null);
+    const resizeRef = useRef(null);
     const maxZRef = useRef(o ? o.items.length : 0);
 
     if (!o) return null;
 
-    const startDrag = (e, pid) => {
-      e.stopPropagation();
-      e.currentTarget.setPointerCapture(e.pointerId);
-      setSel(pid);
+    const bringFront = (pid) => {
       maxZRef.current += 1;
       const mz = maxZRef.current;
       setPieces(prev => prev.map(p => p.pid === pid ? {...p, z: mz} : p));
+    };
+
+    const startDrag = (e, pid) => {
+      if (resizeRef.current) return;
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setSel(pid);
+      bringFront(pid);
       const piece = pieces.find(p => p.pid === pid);
       dragRef.current = {pid, px: e.clientX, py: e.clientY, ox: piece.x, oy: piece.y};
     };
 
-    const moveDrag = (e) => {
-      if (!dragRef.current) return;
-      const dx = e.clientX - dragRef.current.px;
-      const dy = e.clientY - dragRef.current.py;
-      setPieces(prev => prev.map(p =>
-        p.pid === dragRef.current.pid ? {...p, x: dragRef.current.ox + dx, y: dragRef.current.oy + dy} : p
-      ));
+    const startResize = (e, pid) => {
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      const piece = pieces.find(p => p.pid === pid);
+      resizeRef.current = {pid, px: e.clientX, py: e.clientY, ow: piece.w, oh: piece.h};
     };
 
-    const endDrag = () => {dragRef.current = null;};
+    const onMove = (e) => {
+      if (resizeRef.current) {
+        const dx = e.clientX - resizeRef.current.px;
+        const dy = e.clientY - resizeRef.current.py;
+        setPieces(prev => prev.map(p =>
+          p.pid === resizeRef.current.pid
+            ? {...p, w: Math.max(70, resizeRef.current.ow + dx), h: Math.max(70, resizeRef.current.oh + dy)}
+            : p
+        ));
+      } else if (dragRef.current) {
+        const dx = e.clientX - dragRef.current.px;
+        const dy = e.clientY - dragRef.current.py;
+        setPieces(prev => prev.map(p =>
+          p.pid === dragRef.current.pid ? {...p, x: dragRef.current.ox + dx, y: dragRef.current.oy + dy} : p
+        ));
+      }
+    };
+
+    const onEnd = () => {dragRef.current = null; resizeRef.current = null;};
 
     const act = (fn) => setPieces(prev => prev.map(p => p.pid === sel ? fn(p) : p));
+
+    const addItem = (item) => {
+      maxZRef.current += 1;
+      const newPid = Date.now();
+      setPieces(prev => [...prev, {
+        pid: newPid, item,
+        x: 30 + Math.random() * 120, y: 30 + Math.random() * 80,
+        w: 148, h: 182, flip: false, border: false, z: maxZRef.current,
+      }]);
+      setSel(newPid);
+      setShowPicker(false);
+    };
 
     const TOOLBAR = [
       {icon: "border-style-2", label: "Border", action: () => act(p => ({...p, border: !p.border}))},
       {icon: "flip-horizontal", label: "Flip", action: () => act(p => ({...p, flip: !p.flip}))},
       {
         icon: "copy", label: "Duplicate", action: () => {
-          const src = pieces.find(p => p.pid === sel);
-          if (!src) return;
+          const src = pieces.find(p => p.pid === sel); if (!src) return;
           maxZRef.current += 1;
-          const newPid = Date.now();
-          setPieces(prev => [...prev, {...src, pid: newPid, x: src.x + 20, y: src.y + 20, z: maxZRef.current}]);
-          setSel(newPid);
+          const np = Date.now();
+          setPieces(prev => [...prev, {...src, pid: np, x: src.x + 22, y: src.y + 22, z: maxZRef.current}]);
+          setSel(np);
         }
       },
       {icon: "arrow-bar-to-down", label: "Back", action: () => act(p => ({...p, z: 0}))},
       {icon: "trash", label: "Remove", action: () => {setPieces(prev => prev.filter(p => p.pid !== sel)); setSel(null);}},
     ];
 
+    const BG_COLORS = ["#f5f2ec", "#ffffff", "#1a1814", "#e4dfd6", "#2d3a2d", "#1c2b4a"];
+
     return (
       <div style={{position: "fixed", inset: 0, background: "#fff", zIndex: 500, display: "flex", flexDirection: "column", userSelect: "none"}}>
-        <div style={{padding: "14px 20px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff"}}>
-          <button onClick={() => setShowCollage(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1}}>×</button>
-          <div style={{fontSize: 12, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: C.text}}>{o.name}</div>
-          <button onClick={() => setShowCollage(false)} style={{background: "transparent", fontSize: 13, fontWeight: 600, color: C.accent}}>Done</button>
+        {/* Header */}
+        <div style={{padding: "12px 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff", gap: 8}}>
+          <button onClick={() => setShowCollage(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1, flexShrink: 0}}>×</button>
+          <div style={{display: "flex", alignItems: "center", gap: 5, flex: 1, justifyContent: "center"}}>
+            {BG_COLORS.map(col => (
+              <div key={col} onClick={() => setBgColor(col)} style={{width: 17, height: 17, borderRadius: "50%", background: col, border: bgColor === col ? `2.5px solid ${C.accent}` : `1.5px solid rgba(0,0,0,0.15)`, cursor: "pointer", flexShrink: 0}} />
+            ))}
+          </div>
+          <div style={{display: "flex", alignItems: "center", gap: 10, flexShrink: 0}}>
+            <button onClick={() => setShowPicker(true)} style={{background: "transparent", color: C.accent, fontSize: 13, fontWeight: 600}}>+ Add</button>
+            <button onClick={() => setShowCollage(false)} style={{background: C.accent, color: "#fff", fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 8}}>Done</button>
+          </div>
         </div>
 
+        {/* Canvas */}
         <div
-          style={{flex: 1, position: "relative", background: "#f5f2ec", overflow: "hidden", touchAction: "none"}}
+          style={{flex: 1, position: "relative", background: bgColor, overflow: "hidden", touchAction: "none"}}
+          onPointerMove={onMove}
+          onPointerUp={onEnd}
+          onPointerLeave={onEnd}
           onClick={() => setSel(null)}
         >
+          {pieces.length === 0 && (
+            <div style={{position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, pointerEvents: "none"}}>
+              <i className="ti ti-layout-collage" style={{fontSize: 40, color: "rgba(0,0,0,0.15)"}} aria-hidden="true" />
+              <div style={{fontSize: 13, color: "rgba(0,0,0,0.3)"}}>Tap "+ Add" to add items from your closet</div>
+            </div>
+          )}
           {pieces.map(p => (
             <div
               key={p.pid}
               style={{
-                position: "absolute",
-                left: p.x, top: p.y,
-                width: p.w, height: p.h,
-                zIndex: p.z,
-                background: "#fff",
-                borderRadius: 6,
-                overflow: "hidden",
-                transform: p.flip ? "scaleX(-1)" : "none",
-                border: p.border ? `2.5px solid ${C.accent}` : "2.5px solid transparent",
-                boxShadow: p.pid === sel
-                  ? `0 0 0 2px ${C.accent}, 0 6px 20px rgba(0,0,0,0.18)`
-                  : "0 2px 12px rgba(0,0,0,0.10)",
-                cursor: "grab",
-                touchAction: "none",
+                position: "absolute", left: p.x, top: p.y, width: p.w, height: p.h, zIndex: p.z,
+                touchAction: "none", cursor: "grab",
               }}
               onPointerDown={e => startDrag(e, p.pid)}
-              onPointerMove={moveDrag}
-              onPointerUp={endDrag}
               onClick={e => e.stopPropagation()}
             >
-              {p.item.photo
-                ? <img src={p.item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
-                : <Placeholder item={p.item} size={p.w} />
-              }
+              <div style={{
+                width: "100%", height: "100%",
+                background: "#fff", borderRadius: 8, overflow: "hidden",
+                transform: p.flip ? "scaleX(-1)" : "none",
+                border: p.border ? `2.5px solid ${C.accent}` : "2.5px solid transparent",
+                boxShadow: p.pid === sel ? `0 0 0 2.5px ${C.accent},0 8px 24px rgba(0,0,0,0.2)` : "0 2px 14px rgba(0,0,0,0.12)",
+              }}>
+                {p.item.photo
+                  ? <img src={p.item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
+                  : <Placeholder item={p.item} size={p.w} />
+                }
+              </div>
+              {/* Label below card */}
+              <div style={{textAlign: "center", marginTop: 4, opacity: p.pid === sel ? 1 : 0, transition: "opacity 0.15s"}}>
+                <div style={{fontSize: 9, color: bgColor === "#1a1814" || bgColor === "#2d3a2d" || bgColor === "#1c2b4a" ? "rgba(255,255,255,0.7)" : C.textMuted, lineHeight: 1.2}}>{p.item.brand}</div>
+              </div>
+              {/* Resize handle — SE corner */}
+              {p.pid === sel && (
+                <div
+                  style={{position: "absolute", bottom: -6, right: -6, width: 16, height: 16, background: "#fff", border: `2.5px solid ${C.accent}`, borderRadius: 4, cursor: "se-resize", zIndex: 20, touchAction: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.2)"}}
+                  onPointerDown={e => startResize(e, p.pid)}
+                  onClick={e => e.stopPropagation()}
+                />
+              )}
             </div>
           ))}
         </div>
 
+        {/* Toolbar */}
         {sel !== null ? (
-          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "10px 4px 36px", display: "flex", justifyContent: "space-around", flexShrink: 0}}>
+          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "9px 4px 34px", display: "flex", justifyContent: "space-around", flexShrink: 0}}>
             {TOOLBAR.map(({icon, label, action}) => (
-              <button key={label} onClick={action} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "transparent", color: C.textMid, padding: "4px 10px"}}>
-                <i className={`ti ti-${icon}`} style={{fontSize: 22}} aria-hidden="true" />
+              <button key={label} onClick={action} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "transparent", color: C.textMid, padding: "4px 8px"}}>
+                <i className={`ti ti-${icon}`} style={{fontSize: 21}} aria-hidden="true" />
                 <span style={{fontSize: 10}}>{label}</span>
               </button>
             ))}
           </div>
         ) : (
-          <div style={{padding: "12px 20px 36px", background: "#fff", borderTop: `0.5px solid ${C.border}`, textAlign: "center", fontSize: 11, color: C.textMuted, flexShrink: 0}}>
-            Tap an item to select · Drag to reposition
+          <div style={{padding: "10px 20px 34px", background: "#fff", borderTop: `0.5px solid ${C.border}`, textAlign: "center", fontSize: 11, color: C.textMuted, flexShrink: 0}}>
+            Tap to select · Drag to move · Corner handle to resize
+          </div>
+        )}
+
+        {/* Add from closet sheet */}
+        {showPicker && (
+          <div style={{position: "absolute", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 600, display: "flex", alignItems: "flex-end"}} onClick={() => setShowPicker(false)}>
+            <div style={{width: "100%", background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "72vh", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
+              <div style={{padding: "14px 20px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0}}>
+                <div style={{fontSize: 14, fontWeight: 500}}>Add from Closet</div>
+                <button onClick={() => setShowPicker(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1}}>×</button>
+              </div>
+              <div style={{overflowY: "auto", padding: "10px 12px 30px"}}>
+                <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8}}>
+                  {items.map(item => (
+                    <div key={item.id} onClick={() => addItem(item)} style={{background: item.photo ? "#fff" : C.surface2, borderRadius: 10, overflow: "hidden", border: `0.5px solid ${C.border}`, cursor: "pointer", transition: "transform 0.1s", active: {transform: "scale(0.97)"}}}>
+                      <div style={{height: 100, overflow: "hidden"}}>
+                        {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={80} />}
+                      </div>
+                      <div style={{padding: "5px 7px 7px"}}>
+                        <div style={{fontSize: 9, color: C.textMuted, lineHeight: 1.3}}>{item.brand}</div>
+                        <div style={{fontSize: 10, fontWeight: 500, lineHeight: 1.3}}>{item.name}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -1150,7 +1433,7 @@ export default function App() {
     {id: "closet", icon: "ti-hanger", label: "Closet"},
     {id: "calendar", icon: "ti-calendar", label: "Calendar"},
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
-    {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
+    {id: "discover", icon: "ti-compass", label: "Discover"},
   ];
 
   return (
@@ -1162,7 +1445,7 @@ export default function App() {
           {tab === "closet" && <ClosetScreen />}
           {tab === "calendar" && <CalendarScreen />}
           {tab === "style" && <StyleScreen />}
-          {tab === "shop" && <ShopScreen />}
+          {tab === "discover" && <DiscoverScreen />}
         </div>
 
         <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
@@ -1184,6 +1467,7 @@ export default function App() {
         {showCollage && <OutfitCollage />}
         {showGhostModel && <GhostModel />}
         {showCalDay && <CalendarDaySheet />}
+        {viewBoard && <BoardDetailView />}
       </div>
     </>
   );
