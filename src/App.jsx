@@ -1461,11 +1461,10 @@ export default function App() {
   const NAV = [
     {id: "today", icon: "ti-home", label: "Today"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
-    {id: "_add", center: true},
+    {id: "_add", center: true},          // ← add this
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
     {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
   ];
-
   return (
     <>
       <style>{`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:system-ui,-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}`}</style>
@@ -1479,17 +1478,22 @@ export default function App() {
         </div>
 
         <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
-          {NAV.map(n => n.center ? (
-            <button key="_add" onClick={openAdd} style={{flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 0 22px", background: "transparent"}}>
-              <div style={{width: 44, height: 44, background: "#111", borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -18, boxShadow: "0 2px 10px rgba(0,0,0,0.2)"}}>
-                <i className="ti ti-plus" style={{fontSize: 22, color: "#fff"}} aria-hidden="true" />
-              </div>
-            </button>
+
+          {
+            NAV.map(n => n.center ? (
+              <button key="_add" onClick={openAdd} style={{flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 22, background: "transparent"}}>
+                <div style={{width: 44, height: 44, background: "#111", borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -18, boxShadow: "0 2px 10px rgba(0,0,0,0.18)"}}>
+                  <i className="ti ti-plus" style={{fontSize: 22, color: "#fff"}} aria-hidden="true" />
+                </div>
+              </button>
+            ) : (
+              <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
+                <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
+                <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
+              </button>
+            ))}
           ) : (
-            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
-              <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
-              <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
-            </button>
+
           ))}
         </div>
 
