@@ -1461,9 +1461,9 @@ export default function App() {
   const NAV = [
     {id: "today", icon: "ti-home", label: "Today"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
-    {id: "calendar", icon: "ti-calendar", label: "Calendar"},
+    {id: "_add", center: true},
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
-    {id: "discover", icon: "ti-compass", label: "Discover"},
+    {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
   ];
 
   return (
