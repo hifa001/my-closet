@@ -1,4 +1,4 @@
-import {useState, useRef} from "react";
+import {useState, useRef, useEffect} from "react";
 
 const C = {
   bg: "#f0ebe1",
@@ -7,7 +7,7 @@ const C = {
   accent: "#1e3a2f",
   accentMid: "#2d5a3f",
   accentLight: "#e8f0eb",
-  text: "#1a1814",
+  text: "#1a1814", import {useState, useRef, useEffect} from "react";
   textMid: "#4a4540",
   textMuted: "#8a8480",
   border: "rgba(26,24,20,0.11)",
@@ -96,7 +96,9 @@ function DonutChart({segs, size = 140}) {
 }
 
 export default function App() {
-  const [items, setItems] = useState(SAMPLE);
+  const [items, setItems] = useState(() => {
+    try {const s = localStorage.getItem('closet-items'); return s ? JSON.parse(s) : SAMPLE;} catch {return SAMPLE;}
+  });
   const [tab, setTab] = useState("today");
   const [closetTab, setClosetTab] = useState("items");
   const [filterCat, setFilterCat] = useState("All");
@@ -107,9 +109,15 @@ export default function App() {
   const [showClip, setShowClip] = useState(false);
   const [clipUrl, setClipUrl] = useState("");
   const [clipStep, setClipStep] = useState(0);
-  const [outfits, setOutfits] = useState([]);
-  const [collections, setCollections] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [outfits, setOutfits] = useState(() => {
+    try {const s = localStorage.getItem('closet-outfits'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [collections, setCollections] = useState(() => {
+    try {const s = localStorage.getItem('closet-collections'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [wishlist, setWishlist] = useState(() => {
+    try {const s = localStorage.getItem('closet-wishlist'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
   const [collTab, setCollTab] = useState("Packing");
   const [showOutfitBuilder, setShowOutfitBuilder] = useState(false);
   const [outfitName, setOutfitName] = useState("");
@@ -118,7 +126,9 @@ export default function App() {
   const [collageOutfit, setCollageOutfit] = useState(null);
   const [showGhostModel, setShowGhostModel] = useState(false);
   const [ghostOutfit, setGhostOutfit] = useState(null);
-  const [calOutfits, setCalOutfits] = useState({});
+  const [calOutfits, setCalOutfits] = useState(() => {
+    try {const s = localStorage.getItem('closet-caloutfits'); return s ? JSON.parse(s) : {};} catch {return {};}
+  });
   const [showCalDay, setShowCalDay] = useState(false);
   const [calDay, setCalDay] = useState(null);
   const [calMonth, setCalMonth] = useState(() => ({year: new Date().getFullYear(), month: new Date().getMonth()}));
@@ -135,6 +145,25 @@ export default function App() {
   const [viewBoard, setViewBoard] = useState(null);
   const [savedFilter, setSavedFilter] = useState(null);
   const [discoverSearch, setDiscoverSearch] = useState("");
+  useEffect(() => {
+    localStorage.setItem('closet-items', JSON.stringify(items));
+  }, [items]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-outfits', JSON.stringify(outfits));
+  }, [outfits]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-collections', JSON.stringify(collections));
+  }, [collections]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
+  }, [calOutfits]);
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
 
