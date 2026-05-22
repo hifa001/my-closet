@@ -164,6 +164,7 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
   }, [calOutfits]);
+  const [clipMeta, setClipMeta] = useState(null);
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
 
@@ -1478,17 +1479,19 @@ export default function App() {
         </div>
 
         <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
-          {NAV.map(n => (
+          {NAV.map(n => n.center ? (
+            <button key="_add" onClick={openAdd} style={{flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 0 22px", background: "transparent"}}>
+              <div style={{width: 44, height: 44, background: "#111", borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -18, boxShadow: "0 2px 10px rgba(0,0,0,0.2)"}}>
+                <i className="ti ti-plus" style={{fontSize: 22, color: "#fff"}} aria-hidden="true" />
+              </div>
+            </button>
+          ) : (
             <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
               <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
               <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
             </button>
           ))}
         </div>
-
-        <button onClick={openAdd} style={{position: "fixed", bottom: 80, right: "calc(50% - 200px)", width: 50, height: 50, background: C.accent, borderRadius: 25, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99, boxShadow: "0 3px 14px rgba(30,58,47,0.4)"}}>
-          <i className="ti ti-plus" style={{fontSize: 24, color: "#fff"}} aria-hidden="true" />
-        </button>
 
         {showAdd && <AddSheet />}
         {showClip && <ClipSheet />}
