@@ -7,7 +7,7 @@ const C = {
   accent: "#1e3a2f",
   accentMid: "#2d5a3f",
   accentLight: "#e8f0eb",
-  text: "#1a1814", import {useState, useRef, useEffect} from "react";
+  text: "#1a1814",
   textMid: "#4a4540",
   textMuted: "#8a8480",
   border: "rgba(26,24,20,0.11)",
