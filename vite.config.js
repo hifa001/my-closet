@@ -7,6 +7,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
+        skipWaiting: true,
+        clientsClaim: true,
+      },
       manifest: {
         name: 'My Closet',
         short_name: 'Closet',

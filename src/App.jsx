@@ -1,4 +1,5 @@
 import {useState, useRef, useEffect} from "react";
+import {removeBackground} from "@imgly/background-removal";
 
 const C = {
   bg: "#f0ebe1",
@@ -145,6 +146,10 @@ export default function App() {
   const [viewBoard, setViewBoard] = useState(null);
   const [savedFilter, setSavedFilter] = useState(null);
   const [discoverSearch, setDiscoverSearch] = useState("");
+  const [processingBg, setProcessingBg] = useState(false);
+  const [showPinPicker, setShowPinPicker] = useState(false);
+  const [pinItem, setPinItem] = useState(null);
+
   useEffect(() => {
     localStorage.setItem('closet-items', JSON.stringify(items));
   }, [items]);
@@ -164,15 +169,26 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
   }, [calOutfits]);
-  const [clipMeta, setClipMeta] = useState(null);
+
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
 
-  const handlePhoto = (e) => {
+  const handlePhoto = async (e) => {
     const f = e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = ev => setF("photo", ev.target.result);
-    r.readAsDataURL(f);
+    setProcessingBg(true);
+    try {
+      const blob = await removeBackground(f, {
+        output: {format: "image/png", quality: 1},
+        progress: () => {},
+      });
+      const reader = new FileReader();
+      reader.onload = ev => { setF("photo", ev.target.result); setProcessingBg(false); };
+      reader.readAsDataURL(blob);
+    } catch {
+      const r = new FileReader();
+      r.onload = ev => { setF("photo", ev.target.result); setProcessingBg(false); };
+      r.readAsDataURL(f);
+    }
   };
 
   const openAdd = () => {setEditItem(null); setForm(EMPTY); setShowAdd(true);};
@@ -335,10 +351,13 @@ export default function App() {
         </div>
         <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, padding: "0 12px"}}>
           {filtered.map(item => (
-            <div key={item.id} onClick={() => openEdit(item)} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`}}>
-              <div style={{height: 150, background: item.photo ? "#fff" : C.surface2, position: "relative", overflow: "hidden"}}>
+            <div key={item.id} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`, position: "relative"}} onClick={() => openEdit(item)}>
+              <div style={{height: 150, background: item.photo ? "transparent" : C.surface2, position: "relative", overflow: "hidden"}}>
                 {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain", padding: 4}} /> : <Placeholder item={item} size={80} />}
                 {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 6px", borderRadius: 5}}>2ND</div>}
+                <button onClick={e => {e.stopPropagation(); setPinItem(item); setShowPinPicker(true);}} style={{position:"absolute", top:5, right:5, width:24, height:24, background:"rgba(255,255,255,0.88)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", border:"none", boxShadow:"0 1px 4px rgba(0,0,0,0.12)"}}>
+                  <i className="ti ti-bookmark" style={{fontSize:12, color:C.textMid}} aria-hidden="true"/>
+                </button>
               </div>
               <div style={{padding: "7px 9px 10px"}}>
                 <div style={{fontSize: 10, color: C.textMuted, marginBottom: 1}}>{item.brand}</div>
@@ -730,6 +749,56 @@ export default function App() {
     );
   };
 
+  // ── Pin to Board sheet ─────────────────────────────────────────────────
+  const PinPickerSheet = () => {
+    if (!pinItem) return null;
+    const close = () => {setShowPinPicker(false); setPinItem(null);};
+    return (
+      <div style={{position:"fixed", inset:0, background:"rgba(10,8,6,0.55)", zIndex:350, display:"flex", alignItems:"flex-end", justifyContent:"center"}} onClick={close}>
+        <div style={{width:"100%", maxWidth:430, background:C.surface, borderRadius:"20px 20px 0 0", padding:"20px 20px 48px"}} onClick={e => e.stopPropagation()}>
+          <div style={{display:"flex", alignItems:"center", gap:12, marginBottom:16}}>
+            {pinItem.photo && <img src={pinItem.photo} style={{width:44, height:44, objectFit:"contain", borderRadius:8, background:C.surface2}} />}
+            <div>
+              <div style={{fontSize:13, fontWeight:500}}>{pinItem.brand} {pinItem.name}</div>
+              <div style={{fontSize:11, color:C.textMuted}}>Save to board</div>
+            </div>
+          </div>
+          {boards.map(b => {
+            const count = savedItems.filter(s => s.boardId === b.id).length;
+            const alreadySaved = savedItems.some(s => s.boardId === b.id && s.fromCloset && s.itemId === pinItem.id);
+            return (
+              <button key={b.id} onClick={() => {
+                if (!alreadySaved) {
+                  setSavedItems(p => [...p, {id:Date.now(), image:pinItem.photo||null, url:"", brand:pinItem.brand, name:pinItem.name, price:pinItem.price||"", boardId:b.id, fromCloset:true, itemId:pinItem.id, dateAdded:Date.now()}]);
+                  if (pinItem.photo) setBoards(prev => prev.map(bd => bd.id===b.id && !bd.cover ? {...bd, cover:pinItem.photo} : bd));
+                }
+                close();
+                setTab("discover");
+                setDiscoverTab("boards");
+                setViewBoard(b);
+              }} style={{width:"100%", padding:"12px 16px", background: alreadySaved ? C.accentLight : C.surface2, border:`0.5px solid ${alreadySaved ? C.accent : C.border}`, borderRadius:12, fontSize:14, textAlign:"left", marginBottom:8, display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+                <span style={{color: alreadySaved ? C.accent : C.text}}>{b.name}{alreadySaved ? " ✓" : ""}</span>
+                <span style={{fontSize:12, color:C.textMuted}}>{count} items</span>
+              </button>
+            );
+          })}
+          <button onClick={() => {
+            const n = prompt("New board name:");
+            if (!n) return;
+            const bid = Date.now();
+            setBoards(p => [...p, {id:bid, name:n, cover:pinItem.photo||null}]);
+            setSavedItems(p => [...p, {id:Date.now()+1, image:pinItem.photo||null, url:"", brand:pinItem.brand, name:pinItem.name, price:pinItem.price||"", boardId:bid, fromCloset:true, itemId:pinItem.id, dateAdded:Date.now()}]);
+            close();
+            setTab("discover");
+            setDiscoverTab("boards");
+          }} style={{width:"100%", padding:"12px", background:"transparent", border:`1px dashed ${C.borderMed}`, borderRadius:12, color:C.textMuted, fontSize:13}}>
+            + New Board
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // ── Add/Edit sheet ────────────────────────────────────────────────────
   const AddSheet = () => (
     <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={closeAdd}>
@@ -750,11 +819,18 @@ export default function App() {
 
         <div style={{padding: "20px"}}>
           <input ref={fileRef} type="file" accept="image/*" style={{display: "none"}} onChange={handlePhoto} />
-          <div onClick={() => fileRef.current.click()} style={{width: "100%", height: 190, background: C.surface2, borderRadius: 12, border: `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", marginBottom: 20, overflow: "hidden"}}>
-            {form.photo ? <img src={form.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <>
+          <div onClick={() => !processingBg && fileRef.current.click()} style={{width: "100%", height: 190, background: form.photo ? "transparent" : C.surface2, borderRadius: 12, border: form.photo ? "none" : `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: processingBg ? "default" : "pointer", marginBottom: 20, overflow: "hidden", position: "relative"}}>
+            {processingBg ? <>
+              <div style={{width: 36, height: 36, border: `3px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 18, animation: "spin 0.8s linear infinite"}} />
+              <div style={{fontSize: 12, color: C.textMuted}}>Removing background…</div>
+              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.6}}>This takes a few seconds</div>
+            </> : form.photo ? <>
+              <img src={form.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} />
+              <div style={{position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, padding: "3px 8px", borderRadius: 6}}>tap to change</div>
+            </> : <>
               <i className="ti ti-camera" style={{fontSize: 28, color: C.textMuted}} aria-hidden="true" />
               <div style={{fontSize: 13, color: C.textMuted}}>Tap to add photo</div>
-              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Upload from camera roll</div>
+              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Background will be removed automatically</div>
             </>}
           </div>
 
@@ -1168,10 +1244,14 @@ export default function App() {
             >
               <div style={{
                 width: "100%", height: "100%",
-                background: "#fff", borderRadius: 8, overflow: "hidden",
+                background: p.item.photo ? "transparent" : (p.item.hex === "#f0f0f0" ? "#e8e8e8" : p.item.hex + "28"),
+                borderRadius: p.item.photo ? 0 : 8,
+                overflow: "hidden",
                 transform: p.flip ? "scaleX(-1)" : "none",
-                border: p.border ? `2.5px solid ${C.accent}` : "2.5px solid transparent",
-                boxShadow: p.pid === sel ? `0 0 0 2.5px ${C.accent},0 8px 24px rgba(0,0,0,0.2)` : "0 2px 14px rgba(0,0,0,0.12)",
+                outline: p.border ? `2.5px solid ${C.accent}` : p.pid === sel ? `2px solid ${C.accent}` : "none",
+                filter: p.item.photo
+                  ? (p.pid === sel ? `drop-shadow(0 0 6px ${C.accent}) drop-shadow(0 4px 16px rgba(0,0,0,0.3))` : "drop-shadow(0 4px 18px rgba(0,0,0,0.22))")
+                  : (p.pid === sel ? `drop-shadow(0 0 6px ${C.accent})` : "drop-shadow(0 2px 8px rgba(0,0,0,0.15))"),
               }}>
                 {p.item.photo
                   ? <img src={p.item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
@@ -1461,9 +1541,9 @@ export default function App() {
   const NAV = [
     {id: "today", icon: "ti-home", label: "Today"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
-    {id: "_add", center: true},          // ← add this
+    {id: "calendar", icon: "ti-calendar", label: "Calendar"},
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
-    {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
+    {id: "discover", icon: "ti-compass", label: "Discover"},
   ];
   return (
     <>
@@ -1479,26 +1559,17 @@ export default function App() {
 
         <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
 
-          {
-            NAV.map(n => n.center ? (
-              <button key="_add" onClick={openAdd} style={{flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 22, background: "transparent"}}>
-                <div style={{width: 44, height: 44, background: "#111", borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -18, boxShadow: "0 2px 10px rgba(0,0,0,0.18)"}}>
-                  <i className="ti ti-plus" style={{fontSize: 22, color: "#fff"}} aria-hidden="true" />
-                </div>
-              </button>
-            ) : (
-              <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
-                <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
-                <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
-              </button>
-            ))}
-          ) : (
-
+          {NAV.map(n => (
+            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
+              <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
+              <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
+            </button>
           ))}
         </div>
 
         {showAdd && <AddSheet />}
         {showClip && <ClipSheet />}
+        {showPinPicker && <PinPickerSheet />}
         {showOutfitBuilder && <OutfitBuilder />}
         {showCollage && <OutfitCollage />}
         {showGhostModel && <GhostModel />}
