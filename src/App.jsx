@@ -358,7 +358,7 @@ export default function App() {
               <div style={{fontSize: 14, fontWeight: 500}}>Never worn</div>
               <div style={{fontSize: 12, color: C.textMuted}}>{neverWorn.length} items</div>
             </div>
-            <div style={{display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto"}}>
+            <div style={{display: "flex", gap: 8, padding: "12px 0 12px 20px", overflowX: "auto", width: "100wv"}}>
               {neverWorn.slice(0, 7).map(item => (
                 <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 68, cursor: "pointer"}}>
                   <div style={{height: 84, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
@@ -1868,32 +1868,31 @@ export default function App() {
     <>
       <style>{`*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Karla:wght@300;400;500&display=swap');`}</style>
       <div style={{paddingTop: 54, minHeight: "100vh"}}>
-          {tab === "today" && <TodayScreen />}
-          {tab === "closet" && <ClosetScreen />}
-          {tab === "calendar" && <CalendarScreen />}
-          {tab === "style" && <StyleScreen />}
-          {tab === "discover" && <DiscoverScreen />}
-        </div>
-
-        <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
-
-          {NAV.map(n => (
-            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
-              <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
-              <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {showAdd && <AddSheet />}
-        {showClip && <ClipSheet />}
-        {showPinPicker && <PinPickerSheet />}
-        {showOutfitBuilder && <OutfitBuilder />}
-        {showCollage && <OutfitCollage />}
-        {showGhostModel && <GhostModel />}
-        {showCalDay && <CalendarDaySheet />}
-        {viewBoard && <BoardDetailView />}
+        {tab === "today" && <TodayScreen />}
+        {tab === "closet" && <ClosetScreen />}
+        {tab === "calendar" && <CalendarScreen />}
+        {tab === "style" && <StyleScreen />}
+        {tab === "discover" && <DiscoverScreen />}
       </div>
+
+      <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
+
+        {NAV.map(n => (
+          <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
+            <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
+            <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {showAdd && <AddSheet />}
+      {showClip && <ClipSheet />}
+      {showPinPicker && <PinPickerSheet />}
+      {showOutfitBuilder && <OutfitBuilder />}
+      {showCollage && <OutfitCollage />}
+      {showGhostModel && <GhostModel />}
+      {showCalDay && <CalendarDaySheet />}
+      {viewBoard && <BoardDetailView />}
     </>
   );
 }
