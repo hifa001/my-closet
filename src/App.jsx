@@ -2,18 +2,19 @@ import {useState, useRef, useEffect} from "react";
 import {removeBackground} from "@imgly/background-removal";
 
 const C = {
-  bg: "#f0ebe1",
+  bg: "#ffffff",
   surface: "#ffffff",
-  surface2: "#f7f4ef",
-  accent: "#1e3a2f",
-  accentMid: "#2d5a3f",
-  accentLight: "#e8f0eb",
-  text: "#1a1814",
-  textMid: "#4a4540",
-  textMuted: "#8a8480",
-  border: "rgba(26,24,20,0.11)",
-  borderMed: "rgba(26,24,20,0.2)",
+  surface2: "#f8f8f8",
+  accent: "#111111",
+  accentMid: "#333333",
+  accentLight: "#f0f0f0",
+  text: "#111111",
+  textMid: "#555555",
+  textMuted: "#a0a0a0",
+  border: "rgba(0,0,0,0.08)",
+  borderMed: "rgba(0,0,0,0.14)",
 };
+const PF = "'Playfair Display', Georgia, serif";
 
 const COLORS = [
   {name: "Black", hex: "#1a1a1a"}, {name: "Brown", hex: "#6b3f1f"}, {name: "Blue", hex: "#2a5ba8"},
@@ -39,19 +40,29 @@ const CONDITIONS = ["New with tags", "New without tags", "Excellent", "Good", "F
 const SEASONS = ["Spring", "Summer", "Fall", "Winter", "All Season"];
 
 const SAMPLE = [
-  {id: 1, brand: "Free People", name: "Ribbed Tank", category: "Tops", sub: "Tank", size: "S", color: "Black", hex: "#1a1a1a", material: "Cotton", price: 68, wears: 14, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 2, brand: "Gilli", name: "Floral Midi Dress", category: "One Piece", sub: "Dress", size: "S", color: "Black", hex: "#1a1a1a", material: "Polyester", price: 95, wears: 3, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 3, brand: "Levi's", name: "501 Straight Jeans", category: "Bottoms", sub: "Jeans", size: "27", color: "Blue", hex: "#2a5ba8", material: "Denim", price: 128, wears: 22, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: ""},
-  {id: 4, brand: "Levi's", name: "Dark Wash Flare", category: "Bottoms", sub: "Jeans", size: "27", color: "Black", hex: "#1a1a1a", material: "Denim", price: 98, wears: 8, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 5, brand: "Levi's", name: "Light Wash Straight", category: "Bottoms", sub: "Jeans", size: "28", color: "Blue", hex: "#5b8ed4", material: "Denim", price: 108, wears: 11, secondhand: true, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 6, brand: "ARITZIA", name: "Mini Micro Skirt", category: "Bottoms", sub: "Skirt", size: "S", color: "Brown", hex: "#5a2e10", material: "Cotton", price: 65, wears: 4, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 7, brand: "COS", name: "Muscle Tee", category: "Tops", sub: "T-shirt", size: "S", color: "White", hex: "#f0f0f0", material: "Cotton", price: 45, wears: 18, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 8, brand: "New Balance", name: "550 Sneakers", category: "Shoes", sub: "Sneakers", size: "7", color: "White", hex: "#f5f5f5", material: "Leather", price: 110, wears: 25, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: ""},
-  {id: 9, brand: "Zara", name: "Wide Leg Trousers", category: "Bottoms", sub: "Trousers", size: "S", color: "Beige", hex: "#d4b896", material: "Linen", price: 59, wears: 7, secondhand: false, season: "Summer", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
+  {id: 1, brand: "Free People", name: "Ribbed Tank", category: "Tops", sub: "Tank", size: "S", color: "Black", hex: "#1a1a1a", material: "Cotton", price: 68, wears: 14, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 2, brand: "Gilli", name: "Floral Midi Dress", category: "One Piece", sub: "Dress", size: "S", color: "Black", hex: "#1a1a1a", material: "Polyester", price: 95, wears: 3, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 3, brand: "Levi's", name: "501 Straight Jeans", category: "Bottoms", sub: "Jeans", size: "27", color: "Blue", hex: "#2a5ba8", material: "Denim", price: 128, wears: 22, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 4, brand: "Levi's", name: "Dark Wash Flare", category: "Bottoms", sub: "Jeans", size: "27", color: "Black", hex: "#1a1a1a", material: "Denim", price: 98, wears: 8, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 5, brand: "Levi's", name: "Light Wash Straight", category: "Bottoms", sub: "Jeans", size: "28", color: "Blue", hex: "#5b8ed4", material: "Denim", price: 108, wears: 11, secondhand: true, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 6, brand: "ARITZIA", name: "Mini Micro Skirt", category: "Bottoms", sub: "Skirt", size: "S", color: "Brown", hex: "#5a2e10", material: "Cotton", price: 65, wears: 4, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 7, brand: "COS", name: "Muscle Tee", category: "Tops", sub: "T-shirt", size: "S", color: "White", hex: "#f0f0f0", material: "Cotton", price: 45, wears: 18, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 8, brand: "New Balance", name: "550 Sneakers", category: "Shoes", sub: "Sneakers", size: "7", color: "White", hex: "#f5f5f5", material: "Leather", price: 110, wears: 25, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
+  {id: 9, brand: "Zara", name: "Wide Leg Trousers", category: "Bottoms", sub: "Trousers", size: "S", color: "Beige", hex: "#d4b896", material: "Linen", price: 59, wears: 7, secondhand: false, season: "Summer", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"},
 ];
 
 const BOOKMARKS = ["Ganni", "Faithfull The Brand", "Kotn", "Reformation", "Toteme", "Arket"];
-const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""};
+const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"};
+
+const CHECKER_BG = "repeating-conic-gradient(#d8d8d8 0% 25%,#ffffff 0% 50%) 0 0/14px 14px";
+const ICON_BG_PRESETS = [
+  {label: "None", value: "transparent"},
+  {label: "Checker", value: "checker"},
+  {label: "White", value: "#ffffff"},
+  {label: "Cream", value: "#f7f4ef"},
+  {label: "Sage", value: "#e8f0eb"},
+];
+const photoBg = (iconBg) => iconBg === "checker" ? CHECKER_BG : (iconBg || "transparent");
 
 function Placeholder({item, size = 80}) {
   const bg = item.hex === "#f0f0f0" ? "#ddd" : item.hex + "30";
@@ -100,7 +111,7 @@ export default function App() {
   const [items, setItems] = useState(() => {
     try {const s = localStorage.getItem('closet-items'); return s ? JSON.parse(s) : SAMPLE;} catch {return SAMPLE;}
   });
-  const [tab, setTab] = useState("today");
+  const [tab, setTab] = useState("closet");
   const [closetTab, setClosetTab] = useState("items");
   const [filterCat, setFilterCat] = useState("All");
   const [searchQ, setSearchQ] = useState("");
@@ -135,18 +146,23 @@ export default function App() {
   const [calMonth, setCalMonth] = useState(() => ({year: new Date().getFullYear(), month: new Date().getMonth()}));
   const fileRef = useRef();
   const [clipMeta, setClipMeta] = useState(null);
-  const [boards, setBoards] = useState([
-    {id: 1, name: "Summer", cover: null},
-    {id: 2, name: "Workwear", cover: null},
-    {id: 3, name: "Wishlist", cover: null},
-    {id: 4, name: "Inspo", cover: null},
-  ]);
-  const [savedItems, setSavedItems] = useState([]);
-  const [discoverTab, setDiscoverTab] = useState("boards");
+  const [boards, setBoards] = useState(() => {
+    try {const s = localStorage.getItem('closet-boards'); return s ? JSON.parse(s) : [{id: 1, name: "Summer", cover: null}, {id: 2, name: "Workwear", cover: null}, {id: 3, name: "Wishlist", cover: null}, {id: 4, name: "Inspo", cover: null}];} catch {return [{id: 1, name: "Summer", cover: null}, {id: 2, name: "Workwear", cover: null}, {id: 3, name: "Wishlist", cover: null}, {id: 4, name: "Inspo", cover: null}];}
+  });
+  const [savedItems, setSavedItems] = useState(() => {
+    try {const s = localStorage.getItem('closet-saved'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [discoverTab, setDiscoverTab] = useState("shop");
   const [viewBoard, setViewBoard] = useState(null);
   const [savedFilter, setSavedFilter] = useState(null);
   const [discoverSearch, setDiscoverSearch] = useState("");
   const [processingBg, setProcessingBg] = useState(false);
+  const [browseProducts, setBrowseProducts] = useState([]);
+  const [browseLoading, setBrowseLoading] = useState(false);
+  const [browseCursor, setBrowseCursor] = useState(null);
+  const [browseHasMore, setBrowseHasMore] = useState(true);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [showPinPicker, setShowPinPicker] = useState(false);
   const [pinItem, setPinItem] = useState(null);
 
@@ -170,6 +186,14 @@ export default function App() {
     localStorage.setItem('closet-caloutfits', JSON.stringify(calOutfits));
   }, [calOutfits]);
 
+  useEffect(() => {
+    localStorage.setItem('closet-boards', JSON.stringify(boards));
+  }, [boards]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-saved', JSON.stringify(savedItems));
+  }, [savedItems]);
+
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
 
@@ -182,16 +206,66 @@ export default function App() {
         progress: () => {},
       });
       const reader = new FileReader();
-      reader.onload = ev => { setF("photo", ev.target.result); setProcessingBg(false); };
+      reader.onload = ev => {setF("photo", ev.target.result); setProcessingBg(false);};
       reader.readAsDataURL(blob);
     } catch {
       const r = new FileReader();
-      r.onload = ev => { setF("photo", ev.target.result); setProcessingBg(false); };
+      r.onload = ev => {setF("photo", ev.target.result); setProcessingBg(false);};
       r.readAsDataURL(f);
     }
   };
 
-  const openAdd = () => {setEditItem(null); setForm(EMPTY); setShowAdd(true);};
+  const handlePhotoUrl = async (url) => {
+    const src = url.trim(); if (!src) return;
+    setProcessingBg(true);
+    setShowUrlInput(false);
+    setPhotoUrlInput("");
+    try {
+      const resp = await fetch(src);
+      const blob = await resp.blob();
+      try {
+        const bgBlob = await removeBackground(blob, {output: {format: "image/png", quality: 1}, progress: () => {}});
+        const reader = new FileReader();
+        reader.onload = ev => {setF("photo", ev.target.result); setProcessingBg(false);};
+        reader.readAsDataURL(bgBlob);
+      } catch {
+        const reader = new FileReader();
+        reader.onload = ev => {setF("photo", ev.target.result); setProcessingBg(false);};
+        reader.readAsDataURL(blob);
+      }
+    } catch {
+      setF("photo", src);
+      setProcessingBg(false);
+    }
+  };
+
+  const fetchBrowse = async (cursor = null) => {
+    if (browseLoading) return;
+    setBrowseLoading(true);
+    try {
+      const after = cursor ? `, after: "${cursor}"` : "";
+      const q = `{ products(first: 16${after}) { pageInfo { hasNextPage endCursor } edges { node { id title vendor priceRange { minVariantPrice { amount currencyCode } } images(first: 1) { edges { node { url } } } } } } }`;
+      const res = await fetch("https://mock.shop/api", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: q}),
+      });
+      const {data} = await res.json();
+      const prods = data.products.edges.map(e => e.node);
+      setBrowseProducts(p => cursor ? [...p, ...prods] : prods);
+      setBrowseCursor(data.products.pageInfo.endCursor);
+      setBrowseHasMore(data.products.pageInfo.hasNextPage);
+    } catch { /* fail silently */}
+    setBrowseLoading(false);
+  };
+
+  useEffect(() => {
+    if (tab === "discover" && discoverTab === "shop" && browseProducts.length === 0 && !browseLoading) {
+      fetchBrowse();
+    }
+  }, [tab, discoverTab]);
+
+  const openAdd = () => {setEditItem(null); setForm(EMPTY); setShowUrlInput(false); setPhotoUrlInput(""); setShowAdd(true);};
   const openEdit = (item) => {setEditItem(item); setForm({...item}); setShowAdd(true); setTab("closet");};
   const closeAdd = () => {setShowAdd(false); setEditItem(null); setForm(EMPTY);};
   const saveItem = () => {
@@ -250,11 +324,11 @@ export default function App() {
 
   const TodayScreen = () => (
     <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "20px 20px 14px"}}>
-        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3}}>
+      <div style={{padding: "36px 20px 24px"}}>
+        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6}}>
           {new Date().toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"})}
         </div>
-        <div style={{fontSize: 28, fontWeight: 300, lineHeight: 1.2}}>Good morning</div>
+        <div style={{fontSize: 34, fontFamily: PF, fontWeight: 400, lineHeight: 1.15}}>Good morning</div>
       </div>
 
       <div style={{margin: "0 16px 14px"}}>
@@ -287,7 +361,7 @@ export default function App() {
             <div style={{display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto"}}>
               {neverWorn.slice(0, 7).map(item => (
                 <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 68, cursor: "pointer"}}>
-                  <div style={{height: 84, background: C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
+                  <div style={{height: 84, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
                     {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={68} />}
                   </div>
                   <div style={{fontSize: 9, color: C.textMuted, textAlign: "center", lineHeight: 1.2}}>{item.brand}</div>
@@ -305,7 +379,7 @@ export default function App() {
           </div>
           {[...items].sort((a, b) => b.wears - a.wears).slice(0, 4).map((item, i, arr) => (
             <div key={item.id} onClick={() => openEdit(item)} style={{display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: i < arr.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
-              <div style={{width: 42, height: 52, background: C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
+              <div style={{width: 42, height: 52, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
                 {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={42} />}
               </div>
               <div style={{flex: 1}}>
@@ -352,11 +426,11 @@ export default function App() {
         <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, padding: "0 12px"}}>
           {filtered.map(item => (
             <div key={item.id} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`, position: "relative"}} onClick={() => openEdit(item)}>
-              <div style={{height: 150, background: item.photo ? "transparent" : C.surface2, position: "relative", overflow: "hidden"}}>
+              <div style={{height: 150, background: item.photo ? photoBg(item.iconBg) : C.surface2, position: "relative", overflow: "hidden"}}>
                 {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain", padding: 4}} /> : <Placeholder item={item} size={80} />}
                 {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 6px", borderRadius: 5}}>2ND</div>}
-                <button onClick={e => {e.stopPropagation(); setPinItem(item); setShowPinPicker(true);}} style={{position:"absolute", top:5, right:5, width:24, height:24, background:"rgba(255,255,255,0.88)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", border:"none", boxShadow:"0 1px 4px rgba(0,0,0,0.12)"}}>
-                  <i className="ti ti-bookmark" style={{fontSize:12, color:C.textMid}} aria-hidden="true"/>
+                <button onClick={e => {e.stopPropagation(); setPinItem(item); setShowPinPicker(true);}} style={{position: "absolute", top: 5, right: 5, width: 24, height: 24, background: "rgba(255,255,255,0.88)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.12)"}}>
+                  <i className="ti ti-bookmark" style={{fontSize: 12, color: C.textMid}} aria-hidden="true" />
                 </button>
               </div>
               <div style={{padding: "7px 9px 10px"}}>
@@ -453,18 +527,18 @@ export default function App() {
 
   const StyleScreen = () => (
     <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "20px 20px 14px"}}>
-        <div style={{fontSize: 24, fontWeight: 300}}>Style Stats</div>
+      <div style={{padding: "36px 20px 24px"}}>
+        <div style={{fontSize: 30, fontFamily: PF, fontWeight: 400}}>Style Stats</div>
       </div>
 
       <div style={{margin: "0 16px 14px"}}>
-        <button style={{width: "100%", background: `linear-gradient(135deg,#d4c0a0,#c4a880)`, borderRadius: 14, padding: "16px", display: "flex", alignItems: "center", gap: 14, textAlign: "left", border: "none"}}>
-          <i className="ti ti-ruler-measure" style={{fontSize: 28, color: "#3a200a"}} aria-hidden="true" />
+        <button style={{width: "100%", background: C.surface2, borderRadius: 14, padding: "16px", display: "flex", alignItems: "center", gap: 14, textAlign: "left", border: `0.5px solid ${C.border}`}}>
+          <i className="ti ti-ruler-measure" style={{fontSize: 28, color: C.accent}} aria-hidden="true" />
           <div>
-            <div style={{fontSize: 14, fontWeight: 500, color: "#2a1408"}}>Size Tracker</div>
-            <div style={{fontSize: 12, color: "#5a3020"}}>Your measurements and sizes</div>
+            <div style={{fontSize: 14, fontWeight: 500, color: C.text}}>Size Tracker</div>
+            <div style={{fontSize: 12, color: C.textMuted}}>Your measurements and sizes</div>
           </div>
-          <span style={{marginLeft: "auto", color: "#5a3020", fontSize: 20}}>›</span>
+          <span style={{marginLeft: "auto", color: C.textMuted, fontSize: 20}}>›</span>
         </button>
       </div>
 
@@ -640,8 +714,38 @@ export default function App() {
     );
   };
 
+  const BrowseCard = ({p}) => {
+    const img = p.images.edges[0]?.node.url;
+    const {amount, currencyCode} = p.priceRange.minVariantPrice;
+    const price = parseFloat(amount);
+    const symbol = currencyCode === "USD" ? "$" : currencyCode + " ";
+    const alreadySaved = savedItems.some(s => s.browseId === p.id);
+    const save = () => {setPinItem({id: p.id, brand: p.vendor, name: p.title, price: price.toFixed(0), photo: img || null, url: "", browseId: p.id}); setShowPinPicker(true);};
+    return (
+      <div style={{background: C.surface, borderRadius: 12, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 10}}>
+        <div style={{position: "relative"}}>
+          {img
+            ? <img src={img} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block"}} />
+            : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2}} />
+          }
+          <button onClick={save} style={{position: "absolute", top: 8, right: 8, width: 32, height: 32, background: "rgba(255,255,255,0.92)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 6px rgba(0,0,0,0.12)"}}>
+            <i className={`ti ti-heart${alreadySaved ? "-filled" : ""}`} style={{fontSize: 15, color: alreadySaved ? "#e05070" : C.textMid}} aria-hidden="true" />
+          </button>
+        </div>
+        <div style={{padding: "8px 10px 12px"}}>
+          <div style={{fontSize: 10, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 2}}>{p.vendor}</div>
+          <div style={{fontSize: 12, fontWeight: 500, lineHeight: 1.35, marginBottom: 6}}>{p.title}</div>
+          <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+            <div style={{fontSize: 13, fontWeight: 500}}>{symbol}{price % 1 === 0 ? price : price.toFixed(2)}</div>
+            <button onClick={() => ownThis({image: img, brand: p.vendor, name: p.title, price: price.toFixed(0), url: ""})} style={{fontSize: 10, color: C.textMuted, background: "transparent", padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>I own this</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const DiscoverScreen = () => {
-    const DTABS = [{id: "boards", label: "Boards"}, {id: "saved", label: "Saved"}, {id: "search", label: "Search"}];
+    const DTABS = [{id: "shop", label: "Shop"}, {id: "boards", label: "Boards"}, {id: "saved", label: "Saved"}, {id: "search", label: "Search"}];
     const displayed = savedFilter ? savedItems.filter(s => s.boardId === savedFilter) : savedItems;
     const searchResults = discoverSearch
       ? savedItems.filter(s => [s.brand, s.name].some(v => (v || "").toLowerCase().includes(discoverSearch.toLowerCase())))
@@ -649,8 +753,8 @@ export default function App() {
 
     return (
       <div style={{paddingBottom: 20}}>
-        <div style={{padding: "20px 20px 0"}}>
-          <div style={{fontSize: 24, fontWeight: 300, marginBottom: 16}}>Discover</div>
+        <div style={{padding: "36px 20px 0"}}>
+          <div style={{fontSize: 30, fontFamily: PF, fontWeight: 400, marginBottom: 20}}>Discover</div>
           <div style={{display: "flex", borderBottom: `0.5px solid ${C.border}`, marginBottom: 16}}>
             {DTABS.map(t => (
               <button key={t.id} onClick={() => setDiscoverTab(t.id)} style={{flex: 1, padding: "10px 4px", background: "transparent", color: discoverTab === t.id ? C.text : C.textMuted, fontSize: 13, fontWeight: discoverTab === t.id ? 500 : 400, borderBottom: discoverTab === t.id ? `2px solid ${C.accent}` : "2px solid transparent"}}>
@@ -659,6 +763,35 @@ export default function App() {
             ))}
           </div>
         </div>
+
+        {/* ── Shop ── */}
+        {discoverTab === "shop" && (
+          <div style={{padding: "0 16px"}}>
+            {browseLoading && browseProducts.length === 0 ? (
+              <div style={{textAlign: "center", padding: "60px 20px"}}>
+                <div style={{width: 32, height: 32, border: `2px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 16, animation: "spin 0.8s linear infinite", margin: "0 auto 14px"}} />
+                <div style={{fontSize: 13, color: C.textMuted}}>Loading products…</div>
+              </div>
+            ) : browseProducts.length === 0 ? (
+              <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted}}>
+                <div style={{fontSize: 13}}>Couldn't load products</div>
+                <button onClick={() => fetchBrowse()} style={{marginTop: 12, padding: "8px 18px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13}}>Retry</button>
+              </div>
+            ) : (
+              <>
+                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "start"}}>
+                  <div>{browseProducts.filter((_, i) => i % 2 === 0).map(p => <BrowseCard key={p.id} p={p} />)}</div>
+                  <div>{browseProducts.filter((_, i) => i % 2 === 1).map(p => <BrowseCard key={p.id} p={p} />)}</div>
+                </div>
+                {browseHasMore && (
+                  <button onClick={() => fetchBrowse(browseCursor)} disabled={browseLoading} style={{width: "100%", marginTop: 4, marginBottom: 16, padding: "13px", background: "transparent", border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 13, color: browseLoading ? C.textMuted : C.textMid}}>
+                    {browseLoading ? "Loading…" : "Load more"}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* ── Boards ── */}
         {discoverTab === "boards" && (
@@ -754,13 +887,13 @@ export default function App() {
     if (!pinItem) return null;
     const close = () => {setShowPinPicker(false); setPinItem(null);};
     return (
-      <div style={{position:"fixed", inset:0, background:"rgba(10,8,6,0.55)", zIndex:350, display:"flex", alignItems:"flex-end", justifyContent:"center"}} onClick={close}>
-        <div style={{width:"100%", maxWidth:430, background:C.surface, borderRadius:"20px 20px 0 0", padding:"20px 20px 48px"}} onClick={e => e.stopPropagation()}>
-          <div style={{display:"flex", alignItems:"center", gap:12, marginBottom:16}}>
-            {pinItem.photo && <img src={pinItem.photo} style={{width:44, height:44, objectFit:"contain", borderRadius:8, background:C.surface2}} />}
+      <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 350, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={close}>
+        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px 48px"}} onClick={e => e.stopPropagation()}>
+          <div style={{display: "flex", alignItems: "center", gap: 12, marginBottom: 16}}>
+            {pinItem.photo && <img src={pinItem.photo} style={{width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: C.surface2}} />}
             <div>
-              <div style={{fontSize:13, fontWeight:500}}>{pinItem.brand} {pinItem.name}</div>
-              <div style={{fontSize:11, color:C.textMuted}}>Save to board</div>
+              <div style={{fontSize: 13, fontWeight: 500}}>{pinItem.brand} {pinItem.name}</div>
+              <div style={{fontSize: 11, color: C.textMuted}}>Save to board</div>
             </div>
           </div>
           {boards.map(b => {
@@ -769,16 +902,16 @@ export default function App() {
             return (
               <button key={b.id} onClick={() => {
                 if (!alreadySaved) {
-                  setSavedItems(p => [...p, {id:Date.now(), image:pinItem.photo||null, url:"", brand:pinItem.brand, name:pinItem.name, price:pinItem.price||"", boardId:b.id, fromCloset:true, itemId:pinItem.id, dateAdded:Date.now()}]);
-                  if (pinItem.photo) setBoards(prev => prev.map(bd => bd.id===b.id && !bd.cover ? {...bd, cover:pinItem.photo} : bd));
+                  setSavedItems(p => [...p, {id: Date.now(), image: pinItem.photo || null, url: "", brand: pinItem.brand, name: pinItem.name, price: pinItem.price || "", boardId: b.id, fromCloset: true, itemId: pinItem.id, dateAdded: Date.now()}]);
+                  if (pinItem.photo) setBoards(prev => prev.map(bd => bd.id === b.id && !bd.cover ? {...bd, cover: pinItem.photo} : bd));
                 }
                 close();
                 setTab("discover");
                 setDiscoverTab("boards");
                 setViewBoard(b);
-              }} style={{width:"100%", padding:"12px 16px", background: alreadySaved ? C.accentLight : C.surface2, border:`0.5px solid ${alreadySaved ? C.accent : C.border}`, borderRadius:12, fontSize:14, textAlign:"left", marginBottom:8, display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+              }} style={{width: "100%", padding: "12px 16px", background: alreadySaved ? C.accentLight : C.surface2, border: `0.5px solid ${alreadySaved ? C.accent : C.border}`, borderRadius: 12, fontSize: 14, textAlign: "left", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                 <span style={{color: alreadySaved ? C.accent : C.text}}>{b.name}{alreadySaved ? " ✓" : ""}</span>
-                <span style={{fontSize:12, color:C.textMuted}}>{count} items</span>
+                <span style={{fontSize: 12, color: C.textMuted}}>{count} items</span>
               </button>
             );
           })}
@@ -786,12 +919,12 @@ export default function App() {
             const n = prompt("New board name:");
             if (!n) return;
             const bid = Date.now();
-            setBoards(p => [...p, {id:bid, name:n, cover:pinItem.photo||null}]);
-            setSavedItems(p => [...p, {id:Date.now()+1, image:pinItem.photo||null, url:"", brand:pinItem.brand, name:pinItem.name, price:pinItem.price||"", boardId:bid, fromCloset:true, itemId:pinItem.id, dateAdded:Date.now()}]);
+            setBoards(p => [...p, {id: bid, name: n, cover: pinItem.photo || null}]);
+            setSavedItems(p => [...p, {id: Date.now() + 1, image: pinItem.photo || null, url: "", brand: pinItem.brand, name: pinItem.name, price: pinItem.price || "", boardId: bid, fromCloset: true, itemId: pinItem.id, dateAdded: Date.now()}]);
             close();
             setTab("discover");
             setDiscoverTab("boards");
-          }} style={{width:"100%", padding:"12px", background:"transparent", border:`1px dashed ${C.borderMed}`, borderRadius:12, color:C.textMuted, fontSize:13}}>
+          }} style={{width: "100%", padding: "12px", background: "transparent", border: `1px dashed ${C.borderMed}`, borderRadius: 12, color: C.textMuted, fontSize: 13}}>
             + New Board
           </button>
         </div>
@@ -819,19 +952,45 @@ export default function App() {
 
         <div style={{padding: "20px"}}>
           <input ref={fileRef} type="file" accept="image/*" style={{display: "none"}} onChange={handlePhoto} />
-          <div onClick={() => !processingBg && fileRef.current.click()} style={{width: "100%", height: 190, background: form.photo ? "transparent" : C.surface2, borderRadius: 12, border: form.photo ? "none" : `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: processingBg ? "default" : "pointer", marginBottom: 20, overflow: "hidden", position: "relative"}}>
-            {processingBg ? <>
-              <div style={{width: 36, height: 36, border: `3px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 18, animation: "spin 0.8s linear infinite"}} />
-              <div style={{fontSize: 12, color: C.textMuted}}>Removing background…</div>
-              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.6}}>This takes a few seconds</div>
-            </> : form.photo ? <>
-              <img src={form.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} />
-              <div style={{position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, padding: "3px 8px", borderRadius: 6}}>tap to change</div>
-            </> : <>
-              <i className="ti ti-camera" style={{fontSize: 28, color: C.textMuted}} aria-hidden="true" />
-              <div style={{fontSize: 13, color: C.textMuted}}>Tap to add photo</div>
-              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Background will be removed automatically</div>
-            </>}
+          <div style={{marginBottom: 14}}>
+            <div onClick={() => !processingBg && fileRef.current.click()} style={{width: "100%", height: 190, background: form.photo ? photoBg(form.iconBg) : C.surface2, borderRadius: 12, border: form.photo ? "none" : `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: processingBg ? "default" : "pointer", overflow: "hidden", position: "relative"}}>
+              {processingBg ? <>
+                <div style={{width: 36, height: 36, border: `3px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 18, animation: "spin 0.8s linear infinite"}} />
+                <div style={{fontSize: 12, color: C.textMuted}}>Removing background…</div>
+                <div style={{fontSize: 11, color: C.textMuted, opacity: 0.6}}>This takes a few seconds</div>
+              </> : form.photo ? <>
+                <img src={form.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} />
+                <div style={{position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, padding: "3px 8px", borderRadius: 6}}>tap to change</div>
+              </> : <>
+                <i className="ti ti-camera" style={{fontSize: 28, color: C.textMuted}} aria-hidden="true" />
+                <div style={{fontSize: 13, color: C.textMuted}}>Tap to add photo</div>
+                <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Background will be removed automatically</div>
+              </>}
+            </div>
+            {form.photo && (
+              <div style={{marginTop: 8, padding: "10px 12px", background: C.surface2, borderRadius: 10, border: `0.5px solid ${C.border}`}}>
+                <div style={{fontSize: 10, fontWeight: 500, letterSpacing: "0.08em", color: C.textMuted, marginBottom: 7}}>CARD BACKGROUND</div>
+                <div style={{display: "flex", gap: 7, flexWrap: "wrap"}}>
+                  {ICON_BG_PRESETS.map(preset => (
+                    <button key={preset.value} onClick={() => setF("iconBg", preset.value)} style={{display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 8, border: (form.iconBg || "transparent") === preset.value ? `2px solid ${C.accent}` : `1px solid ${C.border}`, background: C.surface, cursor: "pointer"}}>
+                      <div style={{width: 14, height: 14, borderRadius: 3, flexShrink: 0, border: `1px solid ${C.border}`, background: preset.value === "transparent" ? C.surface : (preset.value === "checker" ? CHECKER_BG : preset.value)}} />
+                      <span style={{fontSize: 11, color: (form.iconBg || "transparent") === preset.value ? C.accent : C.textMid, fontWeight: (form.iconBg || "transparent") === preset.value ? 600 : 400}}>{preset.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{marginBottom: 16}}>
+            {!showUrlInput
+              ? <button onClick={() => setShowUrlInput(true)} style={{background: "transparent", color: C.textMuted, fontSize: 12, padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>Load from URL instead</button>
+              : <div style={{display: "flex", gap: 8, alignItems: "center"}}>
+                <input value={photoUrlInput} onChange={e => setPhotoUrlInput(e.target.value)} placeholder="Paste image URL…" onKeyDown={e => e.key === "Enter" && handlePhotoUrl(photoUrlInput)} style={{flex: 1}} />
+                <button onClick={() => handlePhotoUrl(photoUrlInput)} style={{padding: "10px 14px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 500, flexShrink: 0}}>Load</button>
+                <button onClick={() => {setShowUrlInput(false); setPhotoUrlInput("");}} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1, flexShrink: 0}}>×</button>
+              </div>
+            }
           </div>
 
           {[["BRAND *", <input value={form.brand} onChange={e => setF("brand", e.target.value)} placeholder="e.g. Gilli, Levi's, Zara" />],
@@ -1048,49 +1207,209 @@ export default function App() {
   );
 
   const OutfitBuilder = () => {
-    const [sel, setSel] = useState([]);
+    const [pieces, setPieces] = useState([]);
+    const [sel, setSel] = useState(null);
     const [name, setName] = useState("");
-    const toggle = item => setSel(p => p.find(i => i.id === item.id) ? p.filter(i => i.id !== item.id) : [...p, item]);
+    const [bgColor, setBgColor] = useState("#ffffff");
+    const [trayTab, setTrayTab] = useState("All");
+    const dragRef = useRef(null);
+    const resizeRef = useRef(null);
+    const maxZRef = useRef(0);
+
+    const BG_COLORS = ["#ffffff", "#f5f2ec", "#f0ede8", "#dde4ec", "#1a1814", "#2d3a2d"];
+    const trayItems = trayTab === "All" ? items : items.filter(i => i.category === trayTab);
+
+    const addItem = (item) => {
+      maxZRef.current += 1;
+      const pid = Date.now();
+      const count = pieces.length;
+      const col = count % 3;
+      const row = Math.floor(count / 3);
+      setPieces(prev => [...prev, {
+        pid, item,
+        x: 18 + col * 110 + (row % 2 === 1 ? 22 : 0),
+        y: 14 + row * 74,
+        w: 128, h: 158,
+        flip: false, z: maxZRef.current,
+      }]);
+      setSel(pid);
+    };
+
+    const bringFront = (pid) => {
+      maxZRef.current += 1;
+      const mz = maxZRef.current;
+      setPieces(prev => prev.map(p => p.pid === pid ? {...p, z: mz} : p));
+    };
+
+    const startDrag = (e, pid) => {
+      if (resizeRef.current) return;
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setSel(pid);
+      bringFront(pid);
+      const piece = pieces.find(p => p.pid === pid);
+      dragRef.current = {pid, px: e.clientX, py: e.clientY, ox: piece.x, oy: piece.y};
+    };
+
+    const startResize = (e, pid) => {
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      const piece = pieces.find(p => p.pid === pid);
+      resizeRef.current = {pid, px: e.clientX, py: e.clientY, ow: piece.w, oh: piece.h};
+    };
+
+    const onMove = (e) => {
+      if (resizeRef.current) {
+        const dx = e.clientX - resizeRef.current.px;
+        const dy = e.clientY - resizeRef.current.py;
+        setPieces(prev => prev.map(p =>
+          p.pid === resizeRef.current.pid
+            ? {...p, w: Math.max(60, resizeRef.current.ow + dx), h: Math.max(60, resizeRef.current.oh + dy)}
+            : p
+        ));
+      } else if (dragRef.current) {
+        const dx = e.clientX - dragRef.current.px;
+        const dy = e.clientY - dragRef.current.py;
+        setPieces(prev => prev.map(p =>
+          p.pid === dragRef.current.pid ? {...p, x: dragRef.current.ox + dx, y: dragRef.current.oy + dy} : p
+        ));
+      }
+    };
+
+    const onEnd = () => {dragRef.current = null; resizeRef.current = null;};
+
+    const act = (fn) => setPieces(prev => prev.map(p => p.pid === sel ? fn(p) : p));
+
     const save = () => {
-      if (!name || sel.length === 0) return;
-      setOutfits(p => [...p, {id: Date.now(), name, items: sel}]);
+      if (pieces.length === 0) return;
+      const seen = new Set();
+      const usedItems = pieces.map(p => p.item).filter(item => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+      setOutfits(p => [...p, {id: Date.now(), name: name.trim() || "Untitled Look", items: usedItems}]);
       setShowOutfitBuilder(false);
     };
+
+    const TOOLBAR = [
+      {icon: "flip-horizontal", label: "Flip", action: () => act(p => ({...p, flip: !p.flip}))},
+      {
+        icon: "copy", label: "Duplicate", action: () => {
+          const src = pieces.find(p => p.pid === sel); if (!src) return;
+          maxZRef.current += 1;
+          const np = Date.now();
+          setPieces(prev => [...prev, {...src, pid: np, x: src.x + 20, y: src.y + 20, z: maxZRef.current}]);
+          setSel(np);
+        }
+      },
+      {icon: "arrow-bar-to-down", label: "Back", action: () => act(p => ({...p, z: 0}))},
+      {icon: "trash", label: "Remove", action: () => {setPieces(prev => prev.filter(p => p.pid !== sel)); setSel(null);}},
+    ];
+
     return (
-      <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end"}} onClick={() => setShowOutfitBuilder(false)}>
-        <div style={{width: "100%", maxWidth: 430, margin: "0 auto", background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "86vh", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
-          <div style={{padding: "14px 20px", borderBottom: `0.5px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-            <div style={{fontSize: 15, fontWeight: 500}}>Build Outfit</div>
-            <button onClick={() => setShowOutfitBuilder(false)} style={{background: "transparent", color: C.textMuted, fontSize: 22, lineHeight: 1}}>×</button>
+      <div style={{position: "fixed", inset: 0, background: "#fff", zIndex: 300, display: "flex", flexDirection: "column", userSelect: "none"}}>
+        {/* Header */}
+        <div style={{padding: "12px 12px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff"}}>
+          <button onClick={() => setShowOutfitBuilder(false)} style={{background: "transparent", color: C.textMuted, fontSize: 22, lineHeight: 1, flexShrink: 0}}>×</button>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Name this look…"
+            style={{flex: 1, fontSize: 13, padding: "6px 10px", borderRadius: 8}}
+          />
+          <div style={{display: "flex", gap: 4, alignItems: "center", flexShrink: 0}}>
+            {BG_COLORS.map(col => (
+              <div key={col} onClick={() => setBgColor(col)} style={{width: 15, height: 15, borderRadius: "50%", background: col, border: bgColor === col ? `2.5px solid ${C.accent}` : `1.5px solid rgba(0,0,0,0.18)`, cursor: "pointer", flexShrink: 0}} />
+            ))}
           </div>
-          <div style={{padding: "10px 16px", borderBottom: `0.5px solid ${C.border}`, minHeight: 80}}>
-            {sel.length === 0
-              ? <div style={{fontSize: 12, color: C.textMuted, padding: "8px 0"}}>Select items below to build your look</div>
-              : <div style={{display: "flex", gap: 8, overflowX: "auto"}}>
-                {sel.map(item => (
-                  <div key={item.id} onClick={() => toggle(item)} style={{flexShrink: 0, width: 56, height: 70, background: C.surface2, borderRadius: 8, overflow: "hidden", border: `2px solid ${C.accent}`}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={56} />}
-                  </div>
-                ))}
-              </div>
-            }
-          </div>
-          <div style={{flex: 1, overflowY: "auto", padding: "10px 16px"}}>
-            <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8}}>
-              {items.map(item => (
-                <div key={item.id} onClick={() => toggle(item)} style={{position: "relative", borderRadius: 10, overflow: "hidden", border: `2px solid ${sel.find(i => i.id === item.id) ? C.accent : C.border}`, cursor: "pointer"}}>
-                  <div style={{height: 86, background: C.surface2}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={80} />}
-                  </div>
-                  <div style={{padding: "4px 6px 6px", fontSize: 9, color: C.textMuted}}>{item.brand}</div>
-                  {sel.find(i => i.id === item.id) && <div style={{position: "absolute", top: 5, right: 5, width: 18, height: 18, background: C.accent, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-check" style={{fontSize: 11, color: "#fff"}} aria-hidden="true" /></div>}
-                </div>
-              ))}
+          <button onClick={save} disabled={pieces.length === 0} style={{background: pieces.length === 0 ? C.accentLight : C.accent, color: pieces.length === 0 ? C.textMuted : "#fff", fontSize: 12, fontWeight: 600, padding: "7px 13px", borderRadius: 9, flexShrink: 0}}>Save</button>
+        </div>
+
+        {/* Canvas */}
+        <div
+          style={{flex: 1, position: "relative", background: bgColor, overflow: "hidden", touchAction: "none"}}
+          onPointerMove={onMove}
+          onPointerUp={onEnd}
+          onPointerLeave={onEnd}
+          onClick={() => setSel(null)}
+        >
+          {pieces.length === 0 && (
+            <div style={{position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, pointerEvents: "none"}}>
+              <i className="ti ti-sparkles" style={{fontSize: 38, color: "rgba(0,0,0,0.10)"}} aria-hidden="true" />
+              <div style={{fontSize: 13, color: "rgba(0,0,0,0.25)", textAlign: "center", lineHeight: 1.6}}>Tap items below<br />to build your look</div>
             </div>
+          )}
+          {pieces.map(p => (
+            <div
+              key={p.pid}
+              style={{position: "absolute", left: p.x, top: p.y, width: p.w, height: p.h, zIndex: p.z, touchAction: "none", cursor: "grab"}}
+              onPointerDown={e => startDrag(e, p.pid)}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{
+                width: "100%", height: "100%",
+                background: p.item.photo ? "transparent" : (p.item.hex === "#f0f0f0" ? "#e8e8e8" : p.item.hex + "28"),
+                borderRadius: p.item.photo ? 0 : 8,
+                overflow: "hidden",
+                transform: p.flip ? "scaleX(-1)" : "none",
+                outline: p.pid === sel ? `2px solid ${C.accent}` : "none",
+                filter: p.item.photo
+                  ? (p.pid === sel ? `drop-shadow(0 0 6px ${C.accent}) drop-shadow(0 4px 16px rgba(0,0,0,0.3))` : "drop-shadow(0 4px 18px rgba(0,0,0,0.22))")
+                  : (p.pid === sel ? `drop-shadow(0 0 6px ${C.accent})` : "drop-shadow(0 2px 8px rgba(0,0,0,0.15))"),
+              }}>
+                {p.item.photo
+                  ? <img src={p.item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
+                  : <Placeholder item={p.item} size={p.w} />
+                }
+              </div>
+              {p.pid === sel && (
+                <div
+                  style={{position: "absolute", bottom: -6, right: -6, width: 16, height: 16, background: "#fff", border: `2.5px solid ${C.accent}`, borderRadius: 4, cursor: "se-resize", zIndex: 20, touchAction: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.2)"}}
+                  onPointerDown={e => startResize(e, p.pid)}
+                  onClick={e => e.stopPropagation()}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Toolbar (shown when piece selected) */}
+        {sel !== null && (
+          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "8px 4px 0", display: "flex", justifyContent: "space-around", flexShrink: 0}}>
+            {TOOLBAR.map(({icon, label, action}) => (
+              <button key={label} onClick={action} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2, background: "transparent", color: C.textMid, padding: "4px 10px"}}>
+                <i className={`ti ti-${icon}`} style={{fontSize: 19}} aria-hidden="true" />
+                <span style={{fontSize: 10}}>{label}</span>
+              </button>
+            ))}
           </div>
-          <div style={{padding: "12px 16px 34px", borderTop: `0.5px solid ${C.border}`, display: "flex", gap: 8}}>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Name this outfit…" style={{flex: 1}} />
-            <button onClick={save} style={{padding: "10px 18px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 500, whiteSpace: "nowrap"}}>Save Look</button>
+        )}
+
+        {/* Bottom item tray */}
+        <div style={{background: "#fff", borderTop: sel !== null ? "none" : `0.5px solid ${C.border}`, flexShrink: 0}}>
+          {/* Category chips */}
+          <div style={{display: "flex", gap: 5, padding: "7px 12px 5px", overflowX: "auto"}}>
+            {["All", ...CATEGORIES.map(c => c.name)].map(cat => (
+              <button key={cat} onClick={() => setTrayTab(cat)} style={{flexShrink: 0, padding: "3px 10px", borderRadius: 14, background: trayTab === cat ? C.accent : C.accentLight, color: trayTab === cat ? "#fff" : C.textMid, fontSize: 10, fontWeight: trayTab === cat ? 500 : 400, border: "none"}}>
+                {cat}
+              </button>
+            ))}
+          </div>
+          {/* Item thumbnails */}
+          <div style={{display: "flex", gap: 8, padding: "4px 12px 30px", overflowX: "auto"}}>
+            {trayItems.map(item => (
+              <div key={item.id} onClick={() => addItem(item)} style={{flexShrink: 0, cursor: "pointer", textAlign: "center", width: 58}}>
+                <div style={{width: 58, height: 72, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 3}}>
+                  {item.photo
+                    ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} draggable={false} />
+                    : <Placeholder item={item} size={58} />
+                  }
+                </div>
+                <div style={{fontSize: 8, color: C.textMuted, lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>{item.name}</div>
+              </div>
+            ))}
+            {trayItems.length === 0 && <div style={{fontSize: 12, color: C.textMuted, padding: "20px 8px"}}>No items</div>}
           </div>
         </div>
       </div>
@@ -1301,7 +1620,7 @@ export default function App() {
               <div style={{overflowY: "auto", padding: "10px 12px 30px"}}>
                 <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8}}>
                   {items.map(item => (
-                    <div key={item.id} onClick={() => addItem(item)} style={{background: item.photo ? "#fff" : C.surface2, borderRadius: 10, overflow: "hidden", border: `0.5px solid ${C.border}`, cursor: "pointer", transition: "transform 0.1s", active: {transform: "scale(0.97)"}}}>
+                    <div key={item.id} onClick={() => addItem(item)} style={{background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 10, overflow: "hidden", border: `0.5px solid ${C.border}`, cursor: "pointer", transition: "transform 0.1s", active: {transform: "scale(0.97)"}}}>
                       <div style={{height: 100, overflow: "hidden"}}>
                         {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={80} />}
                       </div>
@@ -1424,9 +1743,9 @@ export default function App() {
 
     return (
       <div style={{paddingBottom: 20}}>
-        <div style={{padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+        <div style={{padding: "36px 20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
           <button onClick={prevMonth} style={{background: "transparent", fontSize: 22, color: C.textMuted, lineHeight: 1, padding: "4px 8px"}}>‹</button>
-          <div style={{fontSize: 20, fontWeight: 300}}>{MONTHS[month]} {year}</div>
+          <div style={{fontSize: 24, fontFamily: PF, fontWeight: 400}}>{MONTHS[month]} {year}</div>
           <button onClick={nextMonth} style={{background: "transparent", fontSize: 22, color: C.textMuted, lineHeight: 1, padding: "4px 8px"}}>›</button>
         </div>
 
@@ -1539,17 +1858,16 @@ export default function App() {
   };
 
   const NAV = [
-    {id: "today", icon: "ti-home", label: "Today"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
     {id: "calendar", icon: "ti-calendar", label: "Calendar"},
+    {id: "today", icon: "ti-home", label: "Today"},
     {id: "style", icon: "ti-chart-pie-2", label: "Style"},
     {id: "discover", icon: "ti-compass", label: "Discover"},
   ];
   return (
     <>
-      <style>{`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:system-ui,-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}`}</style>
-      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100vh", position: "relative", paddingBottom: 80}}>
-        <div style={{paddingTop: 54, minHeight: "100vh"}}>
+      <style>{`*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Karla:wght@300;400;500&display=swap');`}</style>
+      <div style={{paddingTop: 54, minHeight: "100vh"}}>
           {tab === "today" && <TodayScreen />}
           {tab === "closet" && <ClosetScreen />}
           {tab === "calendar" && <CalendarScreen />}

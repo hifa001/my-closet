@@ -38,19 +38,39 @@ const CONDITIONS = ["New with tags", "New without tags", "Excellent", "Good", "F
 const SEASONS = ["Spring", "Summer", "Fall", "Winter", "All Season"];
 
 const SAMPLE = [
-  {id: 1, brand: "Free People", name: "Ribbed Tank", category: "Tops", sub: "Tank", size: "S", color: "Black", hex: "#1a1a1a", material: "Cotton", price: 68, wears: 14, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 2, brand: "Gilli", name: "Floral Midi Dress", category: "One Piece", sub: "Dress", size: "S", color: "Black", hex: "#1a1a1a", material: "Polyester", price: 95, wears: 3, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 3, brand: "Levi's", name: "501 Straight Jeans", category: "Bottoms", sub: "Jeans", size: "27", color: "Blue", hex: "#2a5ba8", material: "Denim", price: 128, wears: 22, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: ""},
-  {id: 4, brand: "Levi's", name: "Dark Wash Flare", category: "Bottoms", sub: "Jeans", size: "27", color: "Black", hex: "#1a1a1a", material: "Denim", price: 98, wears: 8, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 5, brand: "Levi's", name: "Light Wash Straight", category: "Bottoms", sub: "Jeans", size: "28", color: "Blue", hex: "#5b8ed4", material: "Denim", price: 108, wears: 11, secondhand: true, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 6, brand: "ARITZIA", name: "Mini Micro Skirt", category: "Bottoms", sub: "Skirt", size: "S", color: "Brown", hex: "#5a2e10", material: "Cotton", price: 65, wears: 4, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 7, brand: "COS", name: "Muscle Tee", category: "Tops", sub: "T-shirt", size: "S", color: "White", hex: "#f0f0f0", material: "Cotton", price: 45, wears: 18, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
-  {id: 8, brand: "New Balance", name: "550 Sneakers", category: "Shoes", sub: "Sneakers", size: "7", color: "White", hex: "#f5f5f5", material: "Leather", price: 110, wears: 25, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: ""},
-  {id: 9, brand: "Zara", name: "Wide Leg Trousers", category: "Bottoms", sub: "Trousers", size: "S", color: "Beige", hex: "#d4b896", material: "Linen", price: 59, wears: 7, secondhand: false, season: "Summer", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""},
+  {id: 1, brand: "Free People", name: "Ribbed Tank", category: "Tops", sub: "Tank", size: "S", color: "Black", hex: "#1a1a1a", material: "Cotton", price: 68, wears: 14, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 2, brand: "Gilli", name: "Floral Midi Dress", category: "One Piece", sub: "Dress", size: "S", color: "Black", hex: "#1a1a1a", material: "Polyester", price: 95, wears: 3, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 3, brand: "Levi's", name: "501 Straight Jeans", category: "Bottoms", sub: "Jeans", size: "27", color: "Blue", hex: "#2a5ba8", material: "Denim", price: 128, wears: 22, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 4, brand: "Levi's", name: "Dark Wash Flare", category: "Bottoms", sub: "Jeans", size: "27", color: "Black", hex: "#1a1a1a", material: "Denim", price: 98, wears: 8, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 5, brand: "Levi's", name: "Light Wash Straight", category: "Bottoms", sub: "Jeans", size: "28", color: "Blue", hex: "#5b8ed4", material: "Denim", price: 108, wears: 11, secondhand: true, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 6, brand: "ARITZIA", name: "Mini Micro Skirt", category: "Bottoms", sub: "Skirt", size: "S", color: "Brown", hex: "#5a2e10", material: "Cotton", price: 65, wears: 4, secondhand: false, season: "Summer", condition: "Excellent", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 7, brand: "COS", name: "Muscle Tee", category: "Tops", sub: "T-shirt", size: "S", color: "White", hex: "#f0f0f0", material: "Cotton", price: 45, wears: 18, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 8, brand: "New Balance", name: "550 Sneakers", category: "Shoes", sub: "Sneakers", size: "7", color: "White", hex: "#f5f5f5", material: "Leather", price: 110, wears: 25, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "USA", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
+  {id: 9, brand: "Zara", name: "Wide Leg Trousers", category: "Bottoms", sub: "Trousers", size: "S", color: "Beige", hex: "#d4b896", material: "Linen", price: 59, wears: 7, secondhand: false, season: "Summer", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"},
 ];
 
 const BOOKMARKS = ["Ganni", "Faithfull The Brand", "Kotn", "Reformation", "Toteme", "Arket"];
-const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: ""};
+const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconMode: false, iconBg: "transparent"};
+
+const CHECKER_BG = "repeating-conic-gradient(#d8d8d8 0% 25%,#ffffff 0% 50%) 0 0/14px 14px";
+const ICON_BG_PRESETS = [
+  {label: "Transparent", value: "transparent"},
+  {label: "White", value: "#ffffff"},
+  {label: "Light", value: "#f2f0ec"},
+  {label: "Sage", value: "#e8f0eb"},
+];
+
+function PhotoDisplay({item, size = 80}) {
+  const isIcon = item?.iconMode && item?.photo;
+  const bg = isIcon ? (item.iconBg === "transparent" ? CHECKER_BG : (item.iconBg || C.surface2)) : C.surface2;
+  return (
+    <div style={{width: "100%", height: "100%", background: bg}}>
+      {item?.photo
+        ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: isIcon ? "contain" : "cover"}} />
+        : <Placeholder item={item} size={size} />}
+    </div>
+  );
+}
 
 function Placeholder({item, size = 80}) {
   const bg = item.hex === "#f0f0f0" ? "#ddd" : item.hex + "30";
@@ -222,8 +242,8 @@ export default function App() {
             <div style={{display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto"}}>
               {neverWorn.slice(0, 7).map(item => (
                 <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 68, cursor: "pointer"}}>
-                  <div style={{height: 84, background: C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={68} />}
+                  <div style={{height: 84, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
+                    <PhotoDisplay item={item} size={68} />
                   </div>
                   <div style={{fontSize: 9, color: C.textMuted, textAlign: "center", lineHeight: 1.2}}>{item.brand}</div>
                 </div>
@@ -240,8 +260,8 @@ export default function App() {
           </div>
           {[...items].sort((a, b) => b.wears - a.wears).slice(0, 4).map((item, i, arr) => (
             <div key={item.id} onClick={() => openEdit(item)} style={{display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: i < arr.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
-              <div style={{width: 42, height: 52, background: C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={42} />}
+              <div style={{width: 42, height: 52, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
+                <PhotoDisplay item={item} size={42} />
               </div>
               <div style={{flex: 1}}>
                 <div style={{fontSize: 11, color: C.textMuted}}>{item.brand}</div>
@@ -287,8 +307,8 @@ export default function App() {
         <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, padding: "0 12px"}}>
           {filtered.map(item => (
             <div key={item.id} onClick={() => openEdit(item)} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`}}>
-              <div style={{height: 150, background: C.surface2, position: "relative", overflow: "hidden"}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={80} />}
+              <div style={{height: 150, position: "relative", overflow: "hidden"}}>
+                <PhotoDisplay item={item} size={80} />
                 {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 6px", borderRadius: 5}}>2ND</div>}
               </div>
               <div style={{padding: "7px 9px 10px"}}>
@@ -311,8 +331,8 @@ export default function App() {
                 <div style={{fontSize: 14, fontWeight: 500, marginBottom: 8}}>{o.name}</div>
                 <div style={{display: "flex", gap: 6}}>
                   {o.items.slice(0, 5).map(item => (
-                    <div key={item.id} style={{width: 50, height: 62, background: C.surface2, borderRadius: 8, overflow: "hidden", flexShrink: 0}}>
-                      {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={50} />}
+                    <div key={item.id} style={{width: 50, height: 62, borderRadius: 8, overflow: "hidden", flexShrink: 0}}>
+                      <PhotoDisplay item={item} size={50} />
                     </div>
                   ))}
                 </div>
@@ -515,12 +535,36 @@ export default function App() {
 
         <div style={{padding: "20px"}}>
           <input ref={fileRef} type="file" accept="image/*" style={{display: "none"}} onChange={handlePhoto} />
-          <div onClick={() => fileRef.current.click()} style={{width: "100%", height: 190, background: C.surface2, borderRadius: 12, border: `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", marginBottom: 20, overflow: "hidden"}}>
-            {form.photo ? <img src={form.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <>
-              <i className="ti ti-camera" style={{fontSize: 28, color: C.textMuted}} aria-hidden="true" />
-              <div style={{fontSize: 13, color: C.textMuted}}>Tap to add photo</div>
-              <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Upload from camera roll</div>
-            </>}
+          <div style={{marginBottom: 20}}>
+            <div onClick={() => fileRef.current.click()} style={{width: "100%", height: 190, borderRadius: 12, border: `1.5px dashed ${C.borderMed}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", overflow: "hidden", background: form.photo && form.iconMode ? (form.iconBg === "transparent" ? CHECKER_BG : (form.iconBg || C.surface2)) : C.surface2}}>
+              {form.photo ? <img src={form.photo} style={{width: "100%", height: "100%", objectFit: form.iconMode ? "contain" : "cover"}} /> : <>
+                <i className="ti ti-camera" style={{fontSize: 28, color: C.textMuted}} aria-hidden="true" />
+                <div style={{fontSize: 13, color: C.textMuted}}>Tap to add photo</div>
+                <div style={{fontSize: 11, color: C.textMuted, opacity: 0.7}}>Upload from camera roll</div>
+              </>}
+            </div>
+            {form.photo && (
+              <div style={{marginTop: 10, padding: "10px 12px", background: C.surface2, borderRadius: 10, border: `0.5px solid ${C.border}`}}>
+                <label style={{display: "flex", alignItems: "center", gap: 8, cursor: "pointer", marginBottom: form.iconMode ? 10 : 0}}>
+                  <input type="checkbox" checked={form.iconMode} onChange={e => setF("iconMode", e.target.checked)} style={{width: "auto", margin: 0, accentColor: C.accent}} />
+                  <span style={{fontSize: 13, color: C.textMid, fontWeight: 500}}>Product icon</span>
+                  <span style={{fontSize: 11, color: C.textMuted}}>(centers image, preserves transparency)</span>
+                </label>
+                {form.iconMode && (
+                  <div>
+                    <div style={{fontSize: 10, fontWeight: 500, letterSpacing: "0.08em", color: C.textMuted, marginBottom: 6}}>BACKGROUND</div>
+                    <div style={{display: "flex", gap: 7, flexWrap: "wrap"}}>
+                      {ICON_BG_PRESETS.map(preset => (
+                        <button key={preset.value} onClick={() => setF("iconBg", preset.value)} style={{display: "flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 8, border: form.iconBg === preset.value ? `2px solid ${C.accent}` : `1px solid ${C.border}`, background: C.surface, cursor: "pointer"}}>
+                          <div style={{width: 16, height: 16, borderRadius: 4, flexShrink: 0, border: `1px solid ${C.border}`, background: preset.value === "transparent" ? CHECKER_BG : preset.value}} />
+                          <span style={{fontSize: 11, color: form.iconBg === preset.value ? C.accent : C.textMid, fontWeight: form.iconBg === preset.value ? 600 : 400}}>{preset.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {[["BRAND *", <input value={form.brand} onChange={e => setF("brand", e.target.value)} placeholder="e.g. Gilli, Levi's, Zara" />],
@@ -700,8 +744,8 @@ export default function App() {
               ? <div style={{fontSize: 12, color: C.textMuted, padding: "8px 0"}}>Select items below to build your look</div>
               : <div style={{display: "flex", gap: 8, overflowX: "auto"}}>
                 {sel.map(item => (
-                  <div key={item.id} onClick={() => toggle(item)} style={{flexShrink: 0, width: 56, height: 70, background: C.surface2, borderRadius: 8, overflow: "hidden", border: `2px solid ${C.accent}`}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={56} />}
+                  <div key={item.id} onClick={() => toggle(item)} style={{flexShrink: 0, width: 56, height: 70, borderRadius: 8, overflow: "hidden", border: `2px solid ${C.accent}`}}>
+                    <PhotoDisplay item={item} size={56} />
                   </div>
                 ))}
               </div>
@@ -711,8 +755,8 @@ export default function App() {
             <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8}}>
               {items.map(item => (
                 <div key={item.id} onClick={() => toggle(item)} style={{position: "relative", borderRadius: 10, overflow: "hidden", border: `2px solid ${sel.find(i => i.id === item.id) ? C.accent : C.border}`, cursor: "pointer"}}>
-                  <div style={{height: 86, background: C.surface2}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "cover"}} /> : <Placeholder item={item} size={80} />}
+                  <div style={{height: 86}}>
+                    <PhotoDisplay item={item} size={80} />
                   </div>
                   <div style={{padding: "4px 6px 6px", fontSize: 9, color: C.textMuted}}>{item.brand}</div>
                   {sel.find(i => i.id === item.id) && <div style={{position: "absolute", top: 5, right: 5, width: 18, height: 18, background: C.accent, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-check" style={{fontSize: 11, color: "#fff"}} aria-hidden="true" /></div>}
@@ -739,7 +783,7 @@ export default function App() {
 
   return (
     <>
-      <style>{`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:system-ui,-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}`}</style>
+      <style> {`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}body{font-family:system-ui,-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}`}</style>
       <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100vh", position: "relative", paddingBottom: 80}}>
         <div style={{paddingTop: 54, minHeight: "100vh"}}>
           {tab === "today" && <TodayScreen />}
