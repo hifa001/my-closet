@@ -3,8 +3,8 @@
     "short_name": "Closet",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#f0ebe1",
-    "theme_color": "#1e3a2f",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
     "icons": [
         {
             "src": "/icon-192.png",

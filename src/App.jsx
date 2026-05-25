@@ -165,6 +165,14 @@ export default function App() {
   const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [showPinPicker, setShowPinPicker] = useState(false);
   const [pinItem, setPinItem] = useState(null);
+  const [followedBrands, setFollowedBrands] = useState(() => {
+    try {const s = localStorage.getItem('closet-brands'); return s ? JSON.parse(s) : [];} catch {return [];}
+  });
+  const [brandSearch, setBrandSearch] = useState("");
+  const [brandResults, setBrandResults] = useState([]);
+  const [feedProducts, setFeedProducts] = useState([]);
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [discoverTab, setDiscoverTab] = useState("feed");
 
   useEffect(() => {
     localStorage.setItem('closet-items', JSON.stringify(items));
@@ -193,6 +201,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('closet-saved', JSON.stringify(savedItems));
   }, [savedItems]);
+
+  useEffect(() => {
+    localStorage.setItem('closet-brands', JSON.stringify(followedBrands));
+  }, [followedBrands]);
 
   const setF = (k, v) => setForm(p => ({...p, [k]: v}));
   const subCats = CATEGORIES.find(c => c.name === form.category)?.sub || [];
@@ -266,7 +278,7 @@ export default function App() {
   }, [tab, discoverTab]);
 
   const openAdd = () => {setEditItem(null); setForm(EMPTY); setShowUrlInput(false); setPhotoUrlInput(""); setShowAdd(true);};
-  const openEdit = (item) => {setEditItem(item); setForm({...item}); setShowAdd(true); setTab("closet");};
+  const openEdit = (item) => {setEditItem(item); setForm({...item}); setShowAdd(true);};
   const closeAdd = () => {setShowAdd(false); setEditItem(null); setForm(EMPTY);};
   const saveItem = () => {
     if (!form.brand && !form.name) return;
@@ -293,15 +305,15 @@ export default function App() {
   const catSegs = CATEGORIES.map((c, i) => ({v: items.filter(x => x.category === c.name).length, c: ["#1a1a1a", "#2a5ba8", "#c4b49a", "#6b7c4e", "#c9a84c", "#c17070", "#7030a0", "#2a7a30"][i]}));
   const topColor = (() => {const cc = {}; items.forEach(i => {cc[i.color] = (cc[i.color] || 0) + 1}); const t = Object.entries(cc).sort((a, b) => b[1] - a[1])[0]; return t ? {name: t[0], pct: Math.round(t[1] / items.length * 100)} : {name: "—", pct: 0};})();
 
-  const Row = ({label, sub, val}) => (
-    <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `0.5px solid ${C.border}`}}>
+  const Row = ({label, sub, val, onClick}) => (
+    <div onClick={onClick} style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `0.5px solid ${C.border}`, cursor: onClick ? "pointer" : "default"}}>
       <div>
         <div style={{fontSize: 14, color: C.text}}>{label}</div>
         {sub && <div style={{fontSize: 11, color: C.textMuted, marginTop: 2}}>{sub}</div>}
       </div>
       <div style={{display: "flex", alignItems: "center", gap: 8, color: C.textMuted}}>
         {val && <span style={{fontSize: 13, color: C.textMid}}>{val}</span>}
-        <span style={{fontSize: 18}}>›</span>
+        {onClick && <span style={{fontSize: 18}}>›</span>}
       </div>
     </div>
   );
@@ -453,7 +465,7 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <div style={{display: "flex", gap: 8}}>
+                <div style={{display: "flex", alignItems: "center", gap: 8}}>
                   <button onClick={() => {setCollageOutfit(o); setShowCollage(true);}} style={{padding: "6px 14px", background: C.accent, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", gap: 4}}>
                     <i className="ti ti-layout-grid" style={{fontSize: 12}} aria-hidden="true" />
                     Collage
@@ -462,8 +474,15 @@ export default function App() {
                     <i className="ti ti-man" style={{fontSize: 12}} aria-hidden="true" />
                     Model
                   </button>
-                  <button onClick={() => setOutfits(p => p.filter(x => x.id !== o.id))} style={{marginLeft: "auto", padding: "6px 10px", background: "transparent", color: C.textMuted, fontSize: 11}}>
-                    Delete
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Delete "${o.name}"?`)) {
+                        setOutfits(p => p.filter(x => x.id !== o.id));
+                      }
+                    }}
+                    style={{marginLeft: "auto", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", color: C.textMuted, borderRadius: "50%", flexShrink: 0}}
+                  >
+                    <i className="ti ti-trash" style={{fontSize: 15}} aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -627,12 +646,181 @@ export default function App() {
     );
   };
 
+  const searchBrands = async (q) => {
+    if (!q) {setBrandResults([]); return;}
+    const res = await fetch(`/api/brands?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    setBrandResults(data.results || []);
+  };
+
+  const loadFeed = async (brands) => {
+    if (brands.length === 0) {setFeedProducts([]); return;}
+    setFeedLoading(true);
+    try {
+      const results = await Promise.all(
+        brands.map(b => fetch(`/api/feed?url=${encodeURIComponent(b.url)}&limit=12`)
+          .then(r => r.json())
+          .then(d => (d.products || []).map(p => ({...p, brandName: b.name})))
+          .catch(() => [])
+        )
+      );
+      // shuffle all brand results together
+      const all = results.flat().sort(() => Math.random() - 0.5);
+      setFeedProducts(all);
+    } finally {
+      setFeedLoading(false);
+    }
+  };
+
+  const DiscoverScreen = () => {
+    return (
+      <div style={{paddingBottom: 20}}>
+        <div style={{padding: "20px 20px 14px"}}>
+          <div style={{fontSize: 24, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif"}}>Discover</div>
+        </div>
+
+        {/* sub tabs */}
+        <div style={{display: "flex", borderBottom: `1px solid ${C.border}`, marginBottom: 0}}>
+          {[["feed", "My Feed"], ["brands", "Brands"]].map(([id, label]) => (
+            <button key={id} onClick={() => {
+              setDiscoverTab(id);
+              if (id === "feed") loadFeed(followedBrands);
+            }} style={{padding: "10px 20px", background: "transparent", color: discoverTab === id ? C.text : C.textMuted, fontSize: 12, fontWeight: discoverTab === id ? 500 : 400, letterSpacing: "0.03em", borderBottom: discoverTab === id ? `2px solid ${C.text}` : "2px solid transparent"}}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* FEED TAB */}
+        {discoverTab === "feed" && (
+          <div>
+            {followedBrands.length === 0 ? (
+              <div style={{textAlign: "center", padding: "60px 30px"}}>
+                <div style={{fontSize: 32, marginBottom: 12}}>✦</div>
+                <div style={{fontSize: 15, fontWeight: 500, marginBottom: 8}}>Your feed is empty</div>
+                <div style={{fontSize: 13, color: C.textMuted, marginBottom: 20}}>Follow brands to see their latest products here</div>
+                <button onClick={() => setDiscoverTab("brands")} style={{padding: "10px 24px", background: C.accent, color: "#fff", borderRadius: 6, fontSize: 13, fontWeight: 500}}>Browse Brands</button>
+              </div>
+            ) : feedLoading ? (
+              <div style={{textAlign: "center", padding: "60px 20px"}}>
+                <div style={{width: 32, height: 32, border: `2px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 16, margin: "0 auto 12px", animation: "spin 0.8s linear infinite"}} />
+                <div style={{fontSize: 13, color: C.textMuted}}>Loading your feed…</div>
+              </div>
+            ) : (
+              <>
+                {/* followed brands pills */}
+                <div style={{display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto", borderBottom: `0.5px solid ${C.border}`}}>
+                  {followedBrands.map(b => (
+                    <div key={b.handle} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: C.surface2, fontSize: 11, color: C.textMid, whiteSpace: "nowrap"}}>
+                      {b.name}
+                    </div>
+                  ))}
+                  <button onClick={() => setDiscoverTab("brands")} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: "transparent", border: `1px dashed ${C.borderMed}`, fontSize: 11, color: C.textMuted, whiteSpace: "nowrap"}}>+ Add brand</button>
+                </div>
+
+                {/* product grid */}
+                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: C.border}}>
+                  {feedProducts.map((product, i) => (
+                    <div key={`${product.id}-${i}`} style={{background: "#fff", position: "relative"}}>
+                      <a href={product.url} target="_blank" rel="noreferrer" style={{textDecoration: "none", color: "inherit"}}>
+                        <div style={{aspectRatio: "3/4", background: C.surface2, overflow: "hidden"}}>
+                          <img src={product.image} alt={product.title} style={{width: "100%", height: "100%", objectFit: "cover"}} loading="lazy" />
+                        </div>
+                        <div style={{padding: "8px 10px 12px"}}>
+                          <div style={{fontSize: 10, color: C.textMuted, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 2}}>{product.brandName}</div>
+                          <div style={{fontSize: 12, color: C.text, lineHeight: 1.3, marginBottom: 4}}>{product.title}</div>
+                          {product.price && <div style={{fontSize: 12, color: C.textMuted}}>${product.price}</div>}
+                        </div>
+                      </a>
+                      {/* save to closet button */}
+                      <button onClick={() => {
+                        setForm({...EMPTY, name: product.title, brand: product.brandName, price: product.price || "", url: product.url, photo: product.image});
+                        setShowAdd(true);
+                      }} style={{position: "absolute", top: 8, right: 8, width: 30, height: 30, borderRadius: 15, background: "rgba(255,255,255,0.92)", border: "none", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.15)", cursor: "pointer"}}>+</button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* BRANDS TAB */}
+        {discoverTab === "brands" && (
+          <div style={{padding: "16px"}}>
+            {/* search */}
+            <div style={{display: "flex", alignItems: "center", gap: 8, background: C.surface2, borderRadius: 10, border: `0.5px solid ${C.border}`, padding: "8px 12px", marginBottom: 16}}>
+              <i className="ti ti-search" style={{fontSize: 15, color: C.textMuted}} aria-hidden="true" />
+              <input
+                value={brandSearch}
+                onChange={e => {setBrandSearch(e.target.value); searchBrands(e.target.value);}}
+                placeholder="Search brands…"
+                style={{border: "none", background: "transparent", outline: "none", flex: 1, fontSize: 13, padding: 0}}
+              />
+            </div>
+
+            {/* search results */}
+            {brandResults.length > 0 && (
+              <div style={{marginBottom: 24}}>
+                <div style={{fontSize: 11, color: C.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10}}>Results</div>
+                {brandResults.map(b => {
+                  const following = followedBrands.find(f => f.handle === b.handle);
+                  return (
+                    <div key={b.handle} style={{display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `0.5px solid ${C.border}`}}>
+                      <div>
+                        <div style={{fontSize: 14, fontWeight: 500}}>{b.name}</div>
+                        <div style={{fontSize: 11, color: C.textMuted, marginTop: 2}}>{b.url.replace("https://", "")}</div>
+                      </div>
+                      <button onClick={() => {
+                        if (following) {
+                          setFollowedBrands(p => p.filter(f => f.handle !== b.handle));
+                        } else {
+                          setFollowedBrands(p => [...p, b]);
+                        }
+                      }} style={{padding: "6px 16px", borderRadius: 20, background: following ? C.surface2 : C.accent, color: following ? C.textMid : "#fff", fontSize: 12, fontWeight: 500, border: `0.5px solid ${following ? C.border : C.accent}`}}>
+                        {following ? "Following" : "Follow"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* followed brands */}
+            {followedBrands.length > 0 && (
+              <div>
+                <div style={{fontSize: 11, color: C.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10}}>Following</div>
+                {followedBrands.map(b => (
+                  <div key={b.handle} style={{display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `0.5px solid ${C.border}`}}>
+                    <div>
+                      <div style={{fontSize: 14, fontWeight: 500}}>{b.name}</div>
+                      <div style={{fontSize: 11, color: C.textMuted, marginTop: 2}}>{b.url.replace("https://", "")}</div>
+                    </div>
+                    <button onClick={() => setFollowedBrands(p => p.filter(f => f.handle !== b.handle))} style={{padding: "6px 16px", borderRadius: 20, background: C.surface2, color: C.textMid, fontSize: 12, border: `0.5px solid ${C.border}`}}>
+                      Unfollow
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {followedBrands.length === 0 && brandResults.length === 0 && (
+              <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted, fontSize: 13}}>
+                Search for a brand above to get started
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const BoardDetailView = () => {
     if (!viewBoard) return null;
     const bItems = savedItems.filter(s => s.boardId === viewBoard.id);
     return (
       <div style={{position: "fixed", inset: 0, background: C.bg, zIndex: 400, display: "flex", flexDirection: "column"}}>
-        <div style={{padding: "54px 16px 14px", display: "flex", alignItems: "center", gap: 10, background: C.surface, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0}}>
+        <div style={{padding: "calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px", display: "flex", alignItems: "center", gap: 10, background: C.surface, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0}}>
           <button onClick={() => setViewBoard(null)} style={{background: "transparent", color: C.textMid, fontSize: 22, lineHeight: 1}}>←</button>
           <div style={{flex: 1, fontSize: 18, fontWeight: 400}}>{viewBoard.name}</div>
           <span style={{fontSize: 12, color: C.textMuted}}>{bItems.length} items</span>
@@ -824,7 +1012,7 @@ export default function App() {
     const close = () => {setShowPinPicker(false); setPinItem(null);};
     return (
       <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 350, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={close}>
-        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px 48px"}} onClick={e => e.stopPropagation()}>
+        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)"}} onClick={e => e.stopPropagation()}>
           <div style={{display: "flex", alignItems: "center", gap: 12, marginBottom: 16}}>
             {pinItem.photo && <img src={pinItem.photo} style={{width: 44, height: 44, objectFit: "contain", borderRadius: 8, background: C.surface2}} />}
             <div>
@@ -871,11 +1059,11 @@ export default function App() {
   // ── Add/Edit sheet ────────────────────────────────────────────────────
   const AddSheet = () => (
     <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={closeAdd}>
-      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "94vh", overflowY: "auto", paddingBottom: 48}} onClick={e => e.stopPropagation()}>
+      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "94dvh", overflowY: "auto", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 48px)"}} onClick={e => e.stopPropagation()}>
         <div style={{padding: "14px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: C.surface, zIndex: 10, borderBottom: `0.5px solid ${C.border}`}}>
           <button onClick={closeAdd} style={{background: "transparent", fontSize: 18, color: C.textMuted, lineHeight: 1}}>←</button>
           <div style={{fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em"}}>{editItem ? "Edit Item" : "Add Item"}</div>
-          {editItem ? <button onClick={() => deleteItem(editItem.id)} style={{background: "transparent"}}><i className="ti ti-trash" style={{fontSize: 18, color: "#c02020"}} aria-hidden="true" /></button> : <div style={{width: 32}} />}
+          <div style={{width: 32}} />
         </div>
 
         {editItem && (
@@ -1040,6 +1228,19 @@ export default function App() {
           <button onClick={saveItem} style={{width: "100%", padding: "14px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500}}>
             {editItem ? "Save Changes" : "Add to Closet"}
           </button>
+
+          {editItem && (
+            <button
+              onClick={() => {
+                if (window.confirm(`Remove "${editItem.name}" from your closet?`)) {
+                  deleteItem(editItem.id);
+                }
+              }}
+              style={{width: "100%", padding: "14px", background: "transparent", color: "#c02020", fontSize: 14, fontWeight: 400, marginTop: 10}}
+            >
+              Delete Item
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -1049,7 +1250,7 @@ export default function App() {
 
   const ClipSheet = () => (
     <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={closeClip}>
-      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "24px 20px 50px", maxHeight: "85vh", overflowY: "auto"}} onClick={e => e.stopPropagation()}>
+      <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "24px 20px", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 50px)", maxHeight: "85dvh", overflowY: "auto"}} onClick={e => e.stopPropagation()}>
         {clipStep !== 3 && (
           <>
             <div style={{display: "flex", alignItems: "center", gap: 10, marginBottom: 4}}>
@@ -1246,7 +1447,7 @@ export default function App() {
     return (
       <div style={{position: "fixed", inset: 0, background: "#fff", zIndex: 300, display: "flex", flexDirection: "column", userSelect: "none"}}>
         {/* Header */}
-        <div style={{padding: "12px 12px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff"}}>
+        <div style={{padding: "calc(env(safe-area-inset-top, 0px) + 12px) 12px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff"}}>
           <button onClick={() => setShowOutfitBuilder(false)} style={{background: "transparent", color: C.textMuted, fontSize: 22, lineHeight: 1, flexShrink: 0}}>×</button>
           <input
             value={name}
@@ -1333,7 +1534,7 @@ export default function App() {
             ))}
           </div>
           {/* Item thumbnails */}
-          <div style={{display: "flex", gap: 8, padding: "4px 12px 30px", overflowX: "auto"}}>
+          <div style={{display: "flex", gap: 8, padding: "4px 12px", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)", overflowX: "auto"}}>
             {trayItems.map(item => (
               <div key={item.id} onClick={() => addItem(item)} style={{flexShrink: 0, cursor: "pointer", textAlign: "center", width: 58}}>
                 <div style={{width: 58, height: 72, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 3}}>
@@ -1460,7 +1661,7 @@ export default function App() {
     return (
       <div style={{position: "fixed", inset: 0, background: "#fff", zIndex: 500, display: "flex", flexDirection: "column", userSelect: "none"}}>
         {/* Header */}
-        <div style={{padding: "12px 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff", gap: 8}}>
+        <div style={{padding: "calc(env(safe-area-inset-top, 0px) + 12px) 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0, background: "#fff", gap: 8}}>
           <button onClick={() => setShowCollage(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1, flexShrink: 0}}>×</button>
           <div style={{display: "flex", alignItems: "center", gap: 5, flex: 1, justifyContent: "center"}}>
             {BG_COLORS.map(col => (
@@ -1531,7 +1732,7 @@ export default function App() {
 
         {/* Toolbar */}
         {sel !== null ? (
-          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "9px 4px 34px", display: "flex", justifyContent: "space-around", flexShrink: 0}}>
+          <div style={{background: "#fff", borderTop: `0.5px solid ${C.border}`, padding: "9px 4px 0", display: "flex", justifyContent: "space-around", paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)", flexShrink: 0}}>
             {TOOLBAR.map(({icon, label, action}) => (
               <button key={label} onClick={action} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "transparent", color: C.textMid, padding: "4px 8px"}}>
                 <i className={`ti ti-${icon}`} style={{fontSize: 21}} aria-hidden="true" />
@@ -1540,7 +1741,7 @@ export default function App() {
             ))}
           </div>
         ) : (
-          <div style={{padding: "10px 20px 34px", background: "#fff", borderTop: `0.5px solid ${C.border}`, textAlign: "center", fontSize: 11, color: C.textMuted, flexShrink: 0}}>
+          <div style={{padding: "10px 20px", paddingBottom: "max(env(safe-area-inset-bottom, 0px), 20px)", background: "#fff", borderTop: `0.5px solid ${C.border}`, textAlign: "center", fontSize: 11, color: C.textMuted, flexShrink: 0}}>
             Tap to select · Drag to move · Corner handle to resize
           </div>
         )}
@@ -1548,12 +1749,12 @@ export default function App() {
         {/* Add from closet sheet */}
         {showPicker && (
           <div style={{position: "absolute", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 600, display: "flex", alignItems: "flex-end"}} onClick={() => setShowPicker(false)}>
-            <div style={{width: "100%", background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "72vh", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
+            <div style={{width: "100%", background: C.surface, borderRadius: "20px 20px 0 0", maxHeight: "72dvh", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
               <div style={{padding: "14px 20px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `0.5px solid ${C.border}`, flexShrink: 0}}>
                 <div style={{fontSize: 14, fontWeight: 500}}>Add from Closet</div>
                 <button onClick={() => setShowPicker(false)} style={{background: "transparent", color: C.textMuted, fontSize: 20, lineHeight: 1}}>×</button>
               </div>
-              <div style={{overflowY: "auto", padding: "10px 12px 30px"}}>
+              <div style={{overflowY: "auto", padding: "10px 12px", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 30px)"}}>
                 <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8}}>
                   {items.map(item => (
                     <div key={item.id} onClick={() => addItem(item)} style={{background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 10, overflow: "hidden", border: `0.5px solid ${C.border}`, cursor: "pointer", transition: "transform 0.1s", active: {transform: "scale(0.97)"}}}>
@@ -1601,7 +1802,7 @@ export default function App() {
     return (
       <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.94)", zIndex: 400, display: "flex", flexDirection: "column"}} onClick={() => setShowGhostModel(false)}>
         <div style={{width: "100%", maxWidth: 430, margin: "0 auto", height: "100%", display: "flex", flexDirection: "column"}} onClick={e => e.stopPropagation()}>
-          <div style={{padding: "18px 20px 6px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0}}>
+          <div style={{padding: "calc(env(safe-area-inset-top, 0px) + 18px) 20px 6px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0}}>
             <button onClick={() => setShowGhostModel(false)} style={{background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: 22, lineHeight: 1}}>×</button>
             <div style={{fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.9)", letterSpacing: "0.14em", textTransform: "uppercase"}}>{o.name}</div>
             <div style={{width: 30}} />
@@ -1743,7 +1944,7 @@ export default function App() {
     const dateStr = calDay ? new Date(calDay + "T12:00:00").toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"}) : "";
     return (
       <div style={{position: "fixed", inset: 0, background: "rgba(10,8,6,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center"}} onClick={() => setShowCalDay(false)}>
-        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px 50px"}} onClick={e => e.stopPropagation()}>
+        <div style={{width: "100%", maxWidth: 430, background: C.surface, borderRadius: "20px 20px 0 0", padding: "20px 20px", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 50px)"}} onClick={e => e.stopPropagation()}>
           <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14}}>
             <div>
               <div style={{fontSize: 15, fontWeight: 500}}>{dateStr}</div>
@@ -1794,30 +1995,40 @@ export default function App() {
   };
 
   const NAV = [
-    {id: "closet", icon: "ti-hanger", label: "Closet"},
-    {id: "calendar", icon: "ti-calendar", label: "Calendar"},
     {id: "today", icon: "ti-home", label: "Today"},
-    {id: "style", icon: "ti-chart-pie-2", label: "Style"},
+    {id: "closet", icon: "ti-hanger", label: "Closet"},
+    {id: "_add", center: true},
     {id: "discover", icon: "ti-compass", label: "Discover"},
+    {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
+  ];
+  {id: "closet", icon: "ti-hanger", label: "Closet"},
+  {id: "calendar", icon: "ti-calendar", label: "Calendar"},
+  {id: "today", icon: "ti-home", label: "Today"},
+  {id: "style", icon: "ti-chart-pie-2", label: "Style"},
+  {id: "discover", icon: "ti-compass", label: "Discover"},
   ];
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100vh", paddingTop: 54, paddingBottom: 88}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}html{height:-webkit-fill-available}body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text};min-height:100dvh;min-height:-webkit-fill-available;overscroll-behavior:none}input,select,textarea{font-family:inherit;font-size:16px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100dvh", paddingTop: "calc(54px + env(safe-area-inset-top, 0px))", paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))"}}>
         {tab === "today" && <TodayScreen />}
         {tab === "closet" && <ClosetScreen />}
         {tab === "calendar" && <CalendarScreen />}
         {tab === "style" && <StyleScreen />}
         {tab === "discover" && <DiscoverScreen />}
+        {tab === "discover" && <DiscoverScreen />}
       </div>
 
-      <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderTop: `0.5px solid rgba(0,0,0,0.06)`, display: "flex", zIndex: 100}}>
-        {NAV.map(n => (
-          <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 24px", background: "transparent", gap: 3, color: tab === n.id ? C.accent : C.textMuted}}>
-            <i className={`ti ${n.icon}`} style={{fontSize: 20}} aria-hidden="true" />
-            <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.03em"}}>{n.label}</span>
-          </button>
-        ))}
+      <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(255,255,255,0.94)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: `0.5px solid rgba(0,0,0,0.06)`, display: "flex", flexDirection: "column", zIndex: 100}}>
+        <div style={{display: "flex"}}>
+          {NAV.map(n => (
+            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 0 8px", background: "transparent", gap: 3, color: tab === n.id ? C.accent : C.textMuted}}>
+              <i className={`ti ${n.icon}`} style={{fontSize: 20}} aria-hidden="true" />
+              <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.03em"}}>{n.label}</span>
+            </button>
+          ))}
+        </div>
+        <div style={{height: "env(safe-area-inset-bottom, 0px)"}} />
       </div>
 
       {showAdd && <AddSheet />}
