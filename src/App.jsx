@@ -307,15 +307,15 @@ export default function App() {
   );
 
   const Card = ({style, children}) => (
-    <div style={{background: C.surface, borderRadius: 14, border: `0.5px solid ${C.border}`, overflow: "hidden", ...style}}>{children}</div>
+    <div style={{background: C.surface, overflow: "hidden", ...style}}>{children}</div>
   );
 
-  const CardHead = ({icon, title, sub, bg}) => (
-    <div style={{padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, background: bg || C.surface2, borderBottom: `0.5px solid ${C.border}`}}>
-      {icon && <i className={`ti ti-${icon}`} style={{fontSize: 22, color: C.accent}} aria-hidden="true" />}
+  const CardHead = ({icon, title, sub}) => (
+    <div style={{padding: "4px 0 12px", display: "flex", alignItems: "center", gap: 10}}>
+      {icon && <i className={`ti ti-${icon}`} style={{fontSize: 18, color: C.textMuted}} aria-hidden="true" />}
       <div>
-        <div style={{fontSize: 14, fontWeight: 500}}>{title}</div>
-        {sub && <div style={{fontSize: 12, color: C.textMuted}}>{sub}</div>}
+        <div style={{fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: C.textMuted}}>{title}</div>
+        {sub && <div style={{fontSize: 11, color: C.textMuted, marginTop: 1}}>{sub}</div>}
       </div>
     </div>
   );
@@ -324,75 +324,64 @@ export default function App() {
 
   const TodayScreen = () => (
     <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "36px 20px 24px"}}>
+      <div style={{padding: "36px 20px 28px"}}>
         <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6}}>
           {new Date().toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"})}
         </div>
         <div style={{fontSize: 34, fontFamily: PF, fontWeight: 400, lineHeight: 1.15}}>Good morning</div>
       </div>
 
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <CardHead icon="shirt" title="Clothing Stats" sub="All about your wardrobe" />
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{padding: "14px 16px", borderRight: `0.5px solid ${C.border}`}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 4}}>Item Count</div>
-              <div style={{fontSize: 30, fontWeight: 300}}>{items.length}</div>
-            </div>
-            <div style={{padding: "14px 16px"}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 4}}>Closet Value</div>
-              <div style={{fontSize: 22, fontWeight: 300}}>${totalValue.toLocaleString()}</div>
-            </div>
+      <div style={{padding: "0 20px 24px", borderBottom: `0.5px solid ${C.border}`}}>
+        <div style={{display: "flex", gap: 0, marginBottom: 16}}>
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 11, color: C.textMuted, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em"}}>Items</div>
+            <div style={{fontSize: 36, fontWeight: 300, lineHeight: 1}}>{items.length}</div>
           </div>
-          <div style={{padding: "12px 16px"}}>
-            <div style={{fontSize: 11, color: C.textMuted, marginBottom: 6}}>Color</div>
-            <ColorBar items={items} />
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 11, color: C.textMuted, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em"}}>Closet Value</div>
+            <div style={{fontSize: 28, fontWeight: 300, lineHeight: 1}}>${totalValue.toLocaleString()}</div>
           </div>
-        </Card>
+        </div>
+        <div style={{fontSize: 10, color: C.textMuted, marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.06em"}}>Color palette</div>
+        <ColorBar items={items} />
       </div>
 
       {neverWorn.length > 0 && (
-        <div style={{margin: "0 16px 14px"}}>
-          <Card>
-            <div style={{padding: "12px 16px", display: "flex", justifyContent: "space-between", borderBottom: `0.5px solid ${C.border}`}}>
-              <div style={{fontSize: 14, fontWeight: 500}}>Never worn</div>
-              <div style={{fontSize: 12, color: C.textMuted}}>{neverWorn.length} items</div>
-            </div>
-            <div style={{display: "flex", gap: 8, padding: "12px 0 12px 20px", overflowX: "auto", width: "100wv"}}>
-              {neverWorn.slice(0, 7).map(item => (
-                <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 68, cursor: "pointer"}}>
-                  <div style={{height: 84, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
-                    {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={68} />}
-                  </div>
-                  <div style={{fontSize: 9, color: C.textMuted, textAlign: "center", lineHeight: 1.2}}>{item.brand}</div>
+        <div style={{padding: "20px 0 20px", borderBottom: `0.5px solid ${C.border}`}}>
+          <div style={{padding: "0 20px", display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12}}>
+            <div style={{fontSize: 15, fontWeight: 400}}>Never worn</div>
+            <div style={{fontSize: 11, color: C.textMuted}}>{neverWorn.length} items</div>
+          </div>
+          <div style={{display: "flex", gap: 8, padding: "0 0 0 20px", overflowX: "auto"}}>
+            {neverWorn.slice(0, 7).map(item => (
+              <div key={item.id} onClick={() => openEdit(item)} style={{flexShrink: 0, width: 70, cursor: "pointer"}}>
+                <div style={{height: 88, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 8, overflow: "hidden", marginBottom: 4}}>
+                  {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={68} />}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div style={{fontSize: 9, color: C.textMuted, textAlign: "center", lineHeight: 1.2}}>{item.brand}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <div style={{padding: "12px 16px", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{fontSize: 14, fontWeight: 500}}>Most worn</div>
-          </div>
-          {[...items].sort((a, b) => b.wears - a.wears).slice(0, 4).map((item, i, arr) => (
-            <div key={item.id} onClick={() => openEdit(item)} style={{display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: i < arr.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
-              <div style={{width: 42, height: 52, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 7, overflow: "hidden", flexShrink: 0}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={42} />}
-              </div>
-              <div style={{flex: 1}}>
-                <div style={{fontSize: 11, color: C.textMuted}}>{item.brand}</div>
-                <div style={{fontSize: 13, fontWeight: 500}}>{item.name}</div>
-              </div>
-              <div style={{textAlign: "right"}}>
-                <div style={{fontSize: 16, fontWeight: 500, color: C.accent}}>{item.wears}×</div>
-                <div style={{fontSize: 10, color: C.textMuted}}>CPW ${item.wears > 0 ? (item.price / item.wears).toFixed(0) : "—"}</div>
-              </div>
+      <div style={{padding: "20px 20px 0"}}>
+        <div style={{fontSize: 15, fontWeight: 400, marginBottom: 16}}>Most worn</div>
+        {[...items].sort((a, b) => b.wears - a.wears).slice(0, 4).map((item, i, arr) => (
+          <div key={item.id} onClick={() => openEdit(item)} style={{display: "flex", alignItems: "center", gap: 12, paddingBottom: 14, marginBottom: 14, borderBottom: i < arr.length - 1 ? `0.5px solid ${C.border}` : "none", cursor: "pointer"}}>
+            <div style={{width: 44, height: 54, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 6, overflow: "hidden", flexShrink: 0}}>
+              {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={44} />}
             </div>
-          ))}
-        </Card>
+            <div style={{flex: 1}}>
+              <div style={{fontSize: 11, color: C.textMuted}}>{item.brand}</div>
+              <div style={{fontSize: 13, fontWeight: 500}}>{item.name}</div>
+            </div>
+            <div style={{textAlign: "right"}}>
+              <div style={{fontSize: 16, fontWeight: 400, color: C.accent}}>{item.wears}×</div>
+              <div style={{fontSize: 10, color: C.textMuted}}>CPW ${item.wears > 0 ? (item.price / item.wears).toFixed(0) : "—"}</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -400,42 +389,42 @@ export default function App() {
   const ClosetScreen = () => (
     <div style={{paddingBottom: 20}}>
       <div style={{padding: "0 16px 10px"}}>
-        <div style={{display: "flex", alignItems: "center", gap: 8, background: C.surface, borderRadius: 10, border: `0.5px solid ${C.border}`, padding: "8px 12px"}}>
-          <i className="ti ti-search" style={{fontSize: 15, color: C.textMuted}} aria-hidden="true" />
+        <div style={{display: "flex", alignItems: "center", gap: 8, background: C.surface2, borderRadius: 22, padding: "9px 14px"}}>
+          <i className="ti ti-search" style={{fontSize: 14, color: C.textMuted}} aria-hidden="true" />
           <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search brand, category, hashtag…" style={{border: "none", background: "transparent", outline: "none", flex: 1, fontSize: 13, padding: 0}} />
           {searchQ && <button onClick={() => setSearchQ("")} style={{background: "transparent", color: C.textMuted, fontSize: 16, lineHeight: 1}}>×</button>}
         </div>
       </div>
 
-      <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderBottom: `0.5px solid ${C.border}`}}>
-        {[["items", `Items (${items.length})`], ["outfits", `Outfits (${outfits.length})`], ["collections", `Collections (${collections.length})`]].map(([id, label]) => (
-          <button key={id} onClick={() => setClosetTab(id)} style={{padding: "10px 4px", background: "transparent", color: closetTab === id ? C.text : C.textMuted, fontSize: 11, fontWeight: closetTab === id ? 500 : 400, borderBottom: closetTab === id ? `2px solid ${C.accent}` : "2px solid transparent", letterSpacing: "0.03em"}}>
-            {label}
+      <div style={{display: "flex", borderBottom: `0.5px solid ${C.border}`, padding: "0 16px"}}>
+        {[["items", `Items`, items.length], ["outfits", `Outfits`, outfits.length], ["collections", `Collections`, collections.length]].map(([id, label, count]) => (
+          <button key={id} onClick={() => setClosetTab(id)} style={{marginRight: 24, paddingBottom: 8, background: "transparent", color: closetTab === id ? C.text : C.textMuted, fontSize: 13, fontWeight: closetTab === id ? 500 : 400, borderBottom: closetTab === id ? `1.5px solid ${C.accent}` : "1.5px solid transparent", whiteSpace: "nowrap"}}>
+            {label} <span style={{fontSize: 11, color: closetTab === id ? C.textMid : C.textMuted}}>{count}</span>
           </button>
         ))}
       </div>
 
       {closetTab === "items" && <>
-        <div style={{display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto"}}>
+        <div style={{display: "flex", gap: 4, padding: "10px 16px 8px", overflowX: "auto"}}>
           {["All", ...CATEGORIES.map(c => c.name)].map(cat => (
-            <button key={cat} onClick={() => setFilterCat(cat)} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: filterCat === cat ? C.accent : C.surface, color: filterCat === cat ? "#fff" : C.textMid, fontSize: 11, fontWeight: filterCat === cat ? 500 : 400, border: `0.5px solid ${filterCat === cat ? C.accent : C.border}`}}>
+            <button key={cat} onClick={() => setFilterCat(cat)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: filterCat === cat ? C.accent : "transparent", color: filterCat === cat ? "#fff" : C.textMuted, fontSize: 11, fontWeight: filterCat === cat ? 500 : 400, border: "none"}}>
               {cat}
             </button>
           ))}
         </div>
-        <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, padding: "0 12px"}}>
+        <div style={{display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 2, padding: "0 2px"}}>
           {filtered.map(item => (
-            <div key={item.id} style={{background: C.surface, borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`, position: "relative"}} onClick={() => openEdit(item)}>
-              <div style={{height: 150, background: item.photo ? photoBg(item.iconBg) : C.surface2, position: "relative", overflow: "hidden"}}>
-                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain", padding: 4}} /> : <Placeholder item={item} size={80} />}
-                {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 6px", borderRadius: 5}}>2ND</div>}
-                <button onClick={e => {e.stopPropagation(); setPinItem(item); setShowPinPicker(true);}} style={{position: "absolute", top: 5, right: 5, width: 24, height: 24, background: "rgba(255,255,255,0.88)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.12)"}}>
-                  <i className="ti ti-bookmark" style={{fontSize: 12, color: C.textMid}} aria-hidden="true" />
+            <div key={item.id} style={{background: "transparent", overflow: "hidden", cursor: "pointer", position: "relative"}} onClick={() => openEdit(item)}>
+              <div style={{aspectRatio: "3/4", background: item.photo ? photoBg(item.iconBg) : C.surface2, position: "relative", overflow: "hidden"}}>
+                {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={80} />}
+                {item.secondhand && <div style={{position: "absolute", top: 5, left: 5, background: C.accent, color: "#fff", fontSize: 8, fontWeight: 600, padding: "2px 5px", borderRadius: 3}}>2ND</div>}
+                <button onClick={e => {e.stopPropagation(); setPinItem(item); setShowPinPicker(true);}} style={{position: "absolute", top: 5, right: 5, width: 26, height: 26, background: "rgba(255,255,255,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.10)"}}>
+                  <i className="ti ti-bookmark" style={{fontSize: 11, color: C.textMid}} aria-hidden="true" />
                 </button>
               </div>
-              <div style={{padding: "7px 9px 10px"}}>
-                <div style={{fontSize: 10, color: C.textMuted, marginBottom: 1}}>{item.brand}</div>
-                <div style={{fontSize: 11, fontWeight: 500, lineHeight: 1.3}}>{item.name}</div>
+              <div style={{padding: "5px 4px 8px"}}>
+                <div style={{fontSize: 9, color: C.textMuted, marginBottom: 1}}>{item.brand}</div>
+                <div style={{fontSize: 10, fontWeight: 500, lineHeight: 1.3}}>{item.name}</div>
               </div>
             </div>
           ))}
@@ -444,52 +433,37 @@ export default function App() {
       </>}
 
       {closetTab === "outfits" && (
-        <div style={{padding: "16px"}}>
-          <div style={{display: "flex", gap: 8, marginBottom: 14}}>
-            <button onClick={() => setShowOutfitBuilder(true)} style={{flex: 1, padding: "12px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 13, fontWeight: 500}}>+ Build New Outfit</button>
-            <button onClick={() => {setCollageOutfit({name: "New Board", items: []}); setShowCollage(true);}} style={{padding: "12px 14px", background: C.surface, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 13, fontWeight: 500, display: "flex", alignItems: "center", gap: 5}}>
-              <i className="ti ti-layout-collage" style={{fontSize: 15}} aria-hidden="true" />
+        <div style={{padding: "16px 16px 0"}}>
+          <div style={{display: "flex", gap: 8, marginBottom: 20}}>
+            <button onClick={() => setShowOutfitBuilder(true)} style={{flex: 1, padding: "11px", background: C.accent, color: "#fff", borderRadius: 22, fontSize: 13, fontWeight: 500}}>+ Build New Outfit</button>
+            <button onClick={() => {setCollageOutfit({name: "New Board", items: []}); setShowCollage(true);}} style={{padding: "11px 16px", background: C.surface2, color: C.textMid, borderRadius: 22, fontSize: 13, fontWeight: 400, display: "flex", alignItems: "center", gap: 5}}>
+              <i className="ti ti-layout-collage" style={{fontSize: 14}} aria-hidden="true" />
               Board
             </button>
           </div>
           {outfits.length === 0
             ? <div style={{textAlign: "center", padding: "30px", color: C.textMuted, fontSize: 13}}>No outfits yet — build your first look!</div>
-            : outfits.map(o => (
-              <div key={o.id} style={{background: C.surface, borderRadius: 12, border: `0.5px solid ${C.border}`, padding: "12px 14px", marginBottom: 10}}>
-                <div style={{fontSize: 14, fontWeight: 500, marginBottom: 8}}>{o.name}</div>
-                <div style={{display: "flex", gap: 6, marginBottom: 10}}>
-                  {o.items.slice(0, 5).map(item => (
-                    <div key={item.id} style={{width: 50, height: 62, background: C.surface2, borderRadius: 8, overflow: "hidden", flexShrink: 0}}>
-                      {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={50} />}
+            : outfits.map((o, oi, arr) => (
+              <div key={o.id} style={{paddingBottom: 18, marginBottom: 18, borderBottom: oi < arr.length - 1 ? `0.5px solid ${C.border}` : "none"}}>
+                <div style={{fontSize: 15, fontWeight: 400, marginBottom: 10, fontFamily: PF}}>{o.name}</div>
+                <div style={{display: "flex", gap: 4, marginBottom: 12, overflowX: "auto"}}>
+                  {o.items.slice(0, 6).map(item => (
+                    <div key={item.id} style={{width: 54, height: 68, background: item.photo ? photoBg(item.iconBg) : C.surface2, borderRadius: 6, overflow: "hidden", flexShrink: 0}}>
+                      {item.photo ? <img src={item.photo} style={{width: "100%", height: "100%", objectFit: "contain"}} /> : <Placeholder item={item} size={54} />}
                     </div>
                   ))}
                 </div>
-                <div style={{display: "flex", gap: 6}}>
-                  <button onClick={() => {setCollageOutfit(o); setShowCollage(true);}} style={{flex: 1, padding: "7px 10px", background: C.accent, color: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
-                    <i className="ti ti-layout-grid" style={{fontSize: 13}} aria-hidden="true" />
+                <div style={{display: "flex", gap: 8}}>
+                  <button onClick={() => {setCollageOutfit(o); setShowCollage(true);}} style={{padding: "6px 14px", background: C.accent, color: "#fff", borderRadius: 20, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", gap: 4}}>
+                    <i className="ti ti-layout-grid" style={{fontSize: 12}} aria-hidden="true" />
                     Collage
                   </button>
-                  <button onClick={() => {setGhostOutfit(o); setShowGhostModel(true);}} style={{flex: 1, padding: "7px 10px", background: C.surface2, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
-                    <i className="ti ti-man" style={{fontSize: 13}} aria-hidden="true" />
-                    Ghost Model
+                  <button onClick={() => {setGhostOutfit(o); setShowGhostModel(true);}} style={{padding: "6px 14px", background: "transparent", color: C.textMid, borderRadius: 20, fontSize: 11, fontWeight: 400, display: "flex", alignItems: "center", gap: 4, border: `0.5px solid ${C.border}`}}>
+                    <i className="ti ti-man" style={{fontSize: 12}} aria-hidden="true" />
+                    Model
                   </button>
-                  <button onClick={() => {
-                    setForm({
-                      ...EMPTY,
-                      url: clipUrl,
-                      name: clipMeta?.title?.slice(0, 40) || "",
-                      brand: clipMeta?.brand || "",
-                      price: clipMeta?.price || "",
-                      photo: clipMeta?.image || null,
-                    });
-                    setShowClip(false);
-                    setClipUrl("");
-                    setClipStep(0);
-                    setClipMeta(null);
-                    setShowAdd(true);
-                  }} style={{flex: 1, padding: "7px 10px", background: C.surface2, color: C.textMid, border: `0.5px solid ${C.border}`, borderRadius: 8, fontSize: 11, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 5}}>
-                    <i className="ti ti-plus" style={{fontSize: 13}} aria-hidden="true" />
-                    Add
+                  <button onClick={() => setOutfits(p => p.filter(x => x.id !== o.id))} style={{marginLeft: "auto", padding: "6px 10px", background: "transparent", color: C.textMuted, fontSize: 11}}>
+                    Delete
                   </button>
                 </div>
               </div>
@@ -500,25 +474,25 @@ export default function App() {
 
       {closetTab === "collections" && (
         <div style={{padding: "16px"}}>
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16}}>
-            {[{id: "Packing", icon: "briefcase", bg: C.accent}, {id: "Wishlists", icon: "bookmark", bg: "#7a6040"}, {id: "Inspiration", icon: "bulb", bg: "#4a6a2a"}, {id: "Capsules", icon: "layout-grid", bg: "#9a7820"}].map(c => (
-              <button key={c.id} onClick={() => setCollTab(c.id)} style={{padding: "16px 14px", borderRadius: 14, background: c.bg, color: "#fff", textAlign: "left", border: collTab === c.id ? `2px solid ${C.text}` : `2px solid transparent`}}>
-                <i className={`ti ti-${c.icon}`} style={{fontSize: 22, display: "block", marginBottom: 8}} aria-hidden="true" />
-                <div style={{fontSize: 13, fontWeight: 500, fontStyle: "italic"}}>{c.id}</div>
+          <div style={{display: "flex", gap: 0, borderBottom: `0.5px solid ${C.border}`, marginBottom: 18}}>
+            {[{id: "Packing", icon: "briefcase"}, {id: "Wishlists", icon: "bookmark"}, {id: "Inspiration", icon: "bulb"}, {id: "Capsules", icon: "layout-grid"}].map(c => (
+              <button key={c.id} onClick={() => setCollTab(c.id)} style={{flex: 1, padding: "8px 4px", background: "transparent", color: collTab === c.id ? C.text : C.textMuted, fontSize: 11, fontWeight: collTab === c.id ? 500 : 400, borderBottom: collTab === c.id ? `1.5px solid ${C.accent}` : "1.5px solid transparent"}}>
+                {c.id}
               </button>
             ))}
           </div>
           {collections.filter(c => c.type === collTab).length === 0
             ? <div style={{textAlign: "center", padding: "20px", color: C.textMuted, fontSize: 13}}>No {collTab.toLowerCase()} yet.</div>
-            : collections.filter(c => c.type === collTab).map(c => (
-              <div key={c.id} style={{background: C.surface, borderRadius: 12, border: `0.5px solid ${C.border}`, padding: "12px 14px", marginBottom: 10}}>
+            : collections.filter(c => c.type === collTab).map((c, ci, arr) => (
+              <div key={c.id} style={{padding: "12px 0", borderBottom: ci < arr.length - 1 ? `0.5px solid ${C.border}` : "none"}}>
                 <div style={{fontSize: 14, fontWeight: 500}}>{c.name}</div>
                 <div style={{fontSize: 12, color: C.textMuted, marginTop: 2}}>{c.items?.length || 0} items</div>
               </div>
             ))
           }
-          <button onClick={() => {const n = prompt(`New ${collTab.slice(0, -1)} name:`); if (n) setCollections(p => [...p, {id: Date.now(), name: n, type: collTab, items: []}]);}} style={{width: "100%", marginTop: 8, padding: "11px", borderRadius: 12, background: "transparent", border: `1px dashed ${C.borderMed}`, color: C.textMuted, fontSize: 13}}>
-            + New {collTab.slice(0, -1)}
+          <button onClick={() => {const n = prompt(`New ${collTab.slice(0, -1)} name:`); if (n) setCollections(p => [...p, {id: Date.now(), name: n, type: collTab, items: []}]);}} style={{marginTop: 14, padding: "10px 0", color: C.textMuted, fontSize: 13, background: "transparent", display: "flex", alignItems: "center", gap: 6}}>
+            <i className="ti ti-plus" style={{fontSize: 14}} aria-hidden="true" />
+            New {collTab.slice(0, -1)}
           </button>
         </div>
       )}
@@ -526,148 +500,112 @@ export default function App() {
   );
 
   const StyleScreen = () => (
-    <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "36px 20px 24px"}}>
+    <div style={{padding: "0 0 40px"}}>
+      <div style={{padding: "36px 20px 28px"}}>
         <div style={{fontSize: 30, fontFamily: PF, fontWeight: 400}}>Style Stats</div>
       </div>
 
-      <div style={{margin: "0 16px 14px"}}>
-        <button style={{width: "100%", background: C.surface2, borderRadius: 14, padding: "16px", display: "flex", alignItems: "center", gap: 14, textAlign: "left", border: `0.5px solid ${C.border}`}}>
-          <i className="ti ti-ruler-measure" style={{fontSize: 28, color: C.accent}} aria-hidden="true" />
+      <div style={{padding: "0 20px 20px", borderBottom: `0.5px solid ${C.border}`}}>
+        <button style={{width: "100%", background: C.surface2, borderRadius: 22, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, textAlign: "left"}}>
+          <i className="ti ti-ruler-measure" style={{fontSize: 22, color: C.textMuted}} aria-hidden="true" />
           <div>
-            <div style={{fontSize: 14, fontWeight: 500, color: C.text}}>Size Tracker</div>
-            <div style={{fontSize: 12, color: C.textMuted}}>Your measurements and sizes</div>
+            <div style={{fontSize: 13, fontWeight: 500, color: C.text}}>Size Tracker</div>
+            <div style={{fontSize: 11, color: C.textMuted}}>Your measurements and sizes</div>
           </div>
-          <span style={{marginLeft: "auto", color: C.textMuted, fontSize: 20}}>›</span>
+          <span style={{marginLeft: "auto", color: C.textMuted, fontSize: 18}}>›</span>
         </button>
       </div>
 
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <div style={{padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, background: C.surface2, borderBottom: `0.5px solid ${C.border}`}}>
-            <i className="ti ti-hanger" style={{fontSize: 22, color: C.accent}} aria-hidden="true" />
-            <div>
-              <div style={{fontSize: 14, fontWeight: 500}}>Clothing Stats</div>
-              <div style={{fontSize: 12, color: C.textMuted}}>All about your wardrobe</div>
-            </div>
+      <div style={{padding: "24px 20px", borderBottom: `0.5px solid ${C.border}`}}>
+        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 16}}>Wardrobe</div>
+        <div style={{display: "flex", gap: 0, marginBottom: 16}}>
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 36, fontWeight: 300, lineHeight: 1}}>{items.length}</div>
+            <div style={{fontSize: 11, color: C.textMuted, marginTop: 4}}>items</div>
           </div>
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{padding: "14px 16px", borderRight: `0.5px solid ${C.border}`}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Item Count</div>
-              <div style={{fontSize: 28, fontWeight: 300}}>{items.length}</div>
-            </div>
-            <div style={{padding: "14px 16px"}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Total Closet Value</div>
-              <div style={{fontSize: 20, fontWeight: 300}}>${totalValue.toLocaleString()}</div>
-            </div>
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 28, fontWeight: 300, lineHeight: 1}}>${totalValue.toLocaleString()}</div>
+            <div style={{fontSize: 11, color: C.textMuted, marginTop: 4}}>closet value</div>
           </div>
-          <div style={{padding: "12px 16px", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{fontSize: 11, color: C.textMuted, marginBottom: 6}}>Color</div>
-            <ColorBar items={items} />
-          </div>
-          <div style={{padding: "0 16px"}}>
-            <Row label={`${items.filter(i => i.wears === 0).length} Never Used in an Outfit`} />
-            <Row label="Not Logged on Calendar" />
-            <Row label="Worn History" sub="Top 100 Most and Least Worn" />
-            <Row label="Cost per Wear" sub={`Avg $${avgCPW}`} />
-            <Row label="Purchase Price" sub={`Total $${totalSpend.toLocaleString()}`} />
-            <Row label="100 Most Packed" />
-          </div>
-        </Card>
+        </div>
+        <div style={{fontSize: 10, color: C.textMuted, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em"}}>Color palette</div>
+        <ColorBar items={items} />
+        <div style={{marginTop: 16}}>
+          <Row label={`${items.filter(i => i.wears === 0).length} items never worn`} />
+          <Row label="Cost per Wear" sub={`Avg $${avgCPW}`} />
+          <Row label="Purchase Price" sub={`Total $${totalSpend.toLocaleString()}`} />
+          <Row label="Worn History" sub="Top 100 Most and Least Worn" />
+        </div>
       </div>
 
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <div style={{padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, background: C.surface2, borderBottom: `0.5px solid ${C.border}`}}>
-            <i className="ti ti-layout-columns" style={{fontSize: 22, color: C.accent}} aria-hidden="true" />
-            <div>
-              <div style={{fontSize: 14, fontWeight: 500}}>View Closet By…</div>
-              <div style={{fontSize: 12, color: C.textMuted}}>Browse the closet by field</div>
-            </div>
+      <div style={{padding: "24px 20px", borderBottom: `0.5px solid ${C.border}`}}>
+        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 16}}>Browse By</div>
+        <div style={{display: "flex", alignItems: "center", gap: 24, marginBottom: 20}}>
+          <DonutChart segs={colorSegs} size={130} />
+          <div>
+            <div style={{fontSize: 32, fontWeight: 300, lineHeight: 1}}>{topColor.pct}%</div>
+            <div style={{fontSize: 15, fontWeight: 400, color: C.text, marginTop: 4}}>{topColor.name}</div>
+            <div style={{fontSize: 11, color: C.textMuted, marginTop: 2}}>top color</div>
           </div>
-          <div style={{padding: "16px"}}>
-            <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 12}}>
-              <DonutChart segs={colorSegs} size={150} />
-              <div>
-                <div style={{fontSize: 24, fontWeight: 300}}>{topColor.pct}%</div>
-                <div style={{fontSize: 16, fontWeight: 500, color: C.text}}>{topColor.name}</div>
-                <div style={{fontSize: 11, color: C.textMuted, marginTop: 4}}>Color</div>
+        </div>
+        {["Color", "Status", "Price", "Fabric", "Size", "Season", "Brand"].map(l => <Row key={l} label={l} />)}
+      </div>
+
+      <div style={{padding: "24px 20px", borderBottom: `0.5px solid ${C.border}`}}>
+        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 16}}>Composition</div>
+        {CATEGORIES.map(cat => {
+          const count = items.filter(i => i.category === cat.name).length;
+          if (count === 0) return null;
+          const pct = Math.round(count / items.length * 100);
+          return (
+            <div key={cat.name} style={{marginBottom: 12}}>
+              <div style={{display: "flex", justifyContent: "space-between", marginBottom: 5}}>
+                <span style={{fontSize: 12, color: C.textMid}}>{cat.name}</span>
+                <span style={{fontSize: 12, color: C.textMuted}}>{count} · {pct}%</span>
+              </div>
+              <div style={{height: 3, background: C.surface2, borderRadius: 2, overflow: "hidden"}}>
+                <div style={{height: "100%", width: `${pct}%`, background: C.accent, borderRadius: 2, transition: "width 0.4s"}} />
               </div>
             </div>
-          </div>
-          <div style={{padding: "0 16px"}}>
-            {["Color", "Status", "Price", "Fabric", "Size", "Season", "Brand"].map(l => <Row key={l} label={l} />)}
-          </div>
-        </Card>
+          );
+        })}
+        {items.length === 0 && <div style={{fontSize: 12, color: C.textMuted}}>Add items to see composition.</div>}
       </div>
 
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <CardHead icon="chart-bar" title="Composition" sub="Breakdown by category" />
-          <div style={{padding: "14px 16px"}}>
-            {CATEGORIES.map(cat => {
-              const count = items.filter(i => i.category === cat.name).length;
-              if (count === 0) return null;
-              const pct = Math.round(count / items.length * 100);
-              return (
-                <div key={cat.name} style={{marginBottom: 11}}>
-                  <div style={{display: "flex", justifyContent: "space-between", marginBottom: 4}}>
-                    <span style={{fontSize: 12, color: C.textMid}}>{cat.name}</span>
-                    <span style={{fontSize: 12, color: C.textMuted}}>{count} &nbsp;({pct}%)</span>
-                  </div>
-                  <div style={{height: 6, background: C.surface2, borderRadius: 3, overflow: "hidden"}}>
-                    <div style={{height: "100%", width: `${pct}%`, background: C.accent, borderRadius: 3, transition: "width 0.4s"}} />
-                  </div>
-                </div>
-              );
-            })}
-            {items.length === 0 && <div style={{fontSize: 12, color: C.textMuted}}>Add items to see composition.</div>}
+      <div style={{padding: "24px 20px"}}>
+        <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 16}}>Looks</div>
+        <div style={{display: "flex", gap: 0, marginBottom: 12}}>
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 36, fontWeight: 300, lineHeight: 1}}>{outfits.length}</div>
+            <div style={{fontSize: 11, color: C.textMuted, marginTop: 4}}>outfits</div>
           </div>
-        </Card>
-      </div>
-
-      <div style={{margin: "0 16px 14px"}}>
-        <Card>
-          <CardHead icon="shirt-sport" title="Looks Stats" sub="How you wear your outfits" />
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: `0.5px solid ${C.border}`}}>
-            <div style={{padding: "14px 16px", borderRight: `0.5px solid ${C.border}`}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Outfit Count</div>
-              <div style={{fontSize: 28, fontWeight: 300}}>{outfits.length}</div>
-            </div>
-            <div style={{padding: "14px 16px"}}>
-              <div style={{fontSize: 11, color: C.textMuted, marginBottom: 3}}>Avg. Items per Look</div>
-              <div style={{fontSize: 28, fontWeight: 300}}>{outfits.length > 0 ? Math.round(outfits.reduce((s, o) => s + o.items.length, 0) / outfits.length) : 0}</div>
-            </div>
+          <div style={{flex: 1}}>
+            <div style={{fontSize: 28, fontWeight: 300, lineHeight: 1}}>{outfits.length > 0 ? Math.round(outfits.reduce((s, o) => s + o.items.length, 0) / outfits.length) : 0}</div>
+            <div style={{fontSize: 11, color: C.textMuted, marginTop: 4}}>avg items per look</div>
           </div>
-          <div style={{padding: "0 16px"}}>
-            <Row label="Not Logged on Calendar" />
-            <Row label="Worn History" sub="100 Most Recently Added" />
-            <Row label="100 Most Packed" />
-          </div>
-        </Card>
+        </div>
+        <Row label="Worn History" sub="100 Most Recently Added" />
+        <Row label="100 Most Packed" />
       </div>
     </div>
   );
 
   const SavedCard = ({s, onOwn, onRemove}) => (
-    <div style={{background: C.surface, borderRadius: 12, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 10}}>
-      {s.image
-        ? <img src={s.image} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover"}} />
-        : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-photo" style={{fontSize: 28, color: C.border}} aria-hidden="true" /></div>
-      }
-      <div style={{padding: "8px 10px"}}>
-        {s.brand && <div style={{fontSize: 10, color: C.textMuted, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em"}}>{s.brand}</div>}
-        {s.name && <div style={{fontSize: 12, fontWeight: 500, marginTop: 2, lineHeight: 1.3}}>{s.name}</div>}
-        {s.price && <div style={{fontSize: 12, color: C.accentMid, marginTop: 2}}>${s.price}</div>}
-        <div style={{display: "flex", gap: 5, marginTop: 8}}>
-          <button onClick={onOwn} style={{flex: 1, padding: "5px 6px", background: C.accent, color: "#fff", borderRadius: 7, fontSize: 10, fontWeight: 500}}>I own this</button>
-          {s.url && <a href={s.url} target="_blank" rel="noopener noreferrer" style={{display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: C.surface2, borderRadius: 7, border: `0.5px solid ${C.border}`}}>
-            <i className="ti ti-external-link" style={{fontSize: 13, color: C.textMid}} aria-hidden="true" />
-          </a>}
-          <button onClick={onRemove} style={{display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, background: C.surface2, borderRadius: 7, border: `0.5px solid ${C.border}`}}>
-            <i className="ti ti-x" style={{fontSize: 11, color: C.textMuted}} aria-hidden="true" />
-          </button>
-        </div>
+    <div style={{background: "transparent", overflow: "hidden", marginBottom: 12}}>
+      <div style={{position: "relative"}}>
+        {s.image
+          ? <img src={s.image} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover", borderRadius: 10, display: "block"}} />
+          : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center"}}><i className="ti ti-photo" style={{fontSize: 28, color: C.border}} aria-hidden="true" /></div>
+        }
+        <button onClick={onRemove} style={{position: "absolute", top: 6, right: 6, width: 24, height: 24, background: "rgba(255,255,255,0.88)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.10)"}}>
+          <i className="ti ti-x" style={{fontSize: 10, color: C.textMuted}} aria-hidden="true" />
+        </button>
+      </div>
+      <div style={{padding: "6px 2px 0"}}>
+        {s.brand && <div style={{fontSize: 9, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.06em"}}>{s.brand}</div>}
+        {s.name && <div style={{fontSize: 11, fontWeight: 500, marginTop: 1, lineHeight: 1.3}}>{s.name}</div>}
+        {s.price && <div style={{fontSize: 11, color: C.textMid, marginTop: 1}}>${s.price}</div>}
+        <button onClick={onOwn} style={{marginTop: 5, fontSize: 10, color: C.textMuted, background: "transparent", padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>I own this</button>
       </div>
     </div>
   );
@@ -722,22 +660,22 @@ export default function App() {
     const alreadySaved = savedItems.some(s => s.browseId === p.id);
     const save = () => {setPinItem({id: p.id, brand: p.vendor, name: p.title, price: price.toFixed(0), photo: img || null, url: "", browseId: p.id}); setShowPinPicker(true);};
     return (
-      <div style={{background: C.surface, borderRadius: 12, overflow: "hidden", border: `0.5px solid ${C.border}`, marginBottom: 10}}>
+      <div style={{background: "transparent", overflow: "hidden", marginBottom: 10}}>
         <div style={{position: "relative"}}>
           {img
-            ? <img src={img} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block"}} />
-            : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2}} />
+            ? <img src={img} style={{width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block", borderRadius: 10}} />
+            : <div style={{width: "100%", aspectRatio: "3/4", background: C.surface2, borderRadius: 10}} />
           }
-          <button onClick={save} style={{position: "absolute", top: 8, right: 8, width: 32, height: 32, background: "rgba(255,255,255,0.92)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 6px rgba(0,0,0,0.12)"}}>
-            <i className={`ti ti-heart${alreadySaved ? "-filled" : ""}`} style={{fontSize: 15, color: alreadySaved ? "#e05070" : C.textMid}} aria-hidden="true" />
+          <button onClick={save} style={{position: "absolute", top: 8, right: 8, width: 30, height: 30, background: "rgba(255,255,255,0.9)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.10)"}}>
+            <i className={`ti ti-heart${alreadySaved ? "-filled" : ""}`} style={{fontSize: 13, color: alreadySaved ? "#e05070" : C.textMid}} aria-hidden="true" />
           </button>
         </div>
-        <div style={{padding: "8px 10px 12px"}}>
-          <div style={{fontSize: 10, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 2}}>{p.vendor}</div>
-          <div style={{fontSize: 12, fontWeight: 500, lineHeight: 1.35, marginBottom: 6}}>{p.title}</div>
+        <div style={{padding: "6px 2px 8px"}}>
+          <div style={{fontSize: 9, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 1}}>{p.vendor}</div>
+          <div style={{fontSize: 11, fontWeight: 500, lineHeight: 1.35, marginBottom: 4}}>{p.title}</div>
           <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-            <div style={{fontSize: 13, fontWeight: 500}}>{symbol}{price % 1 === 0 ? price : price.toFixed(2)}</div>
-            <button onClick={() => ownThis({image: img, brand: p.vendor, name: p.title, price: price.toFixed(0), url: ""})} style={{fontSize: 10, color: C.textMuted, background: "transparent", padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>I own this</button>
+            <div style={{fontSize: 12, fontWeight: 400}}>{symbol}{price % 1 === 0 ? price : price.toFixed(2)}</div>
+            <button onClick={() => ownThis({image: img, brand: p.vendor, name: p.title, price: price.toFixed(0), url: ""})} style={{fontSize: 10, color: C.textMuted, background: "transparent", padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>own it</button>
           </div>
         </div>
       </div>
@@ -757,7 +695,7 @@ export default function App() {
           <div style={{fontSize: 30, fontFamily: PF, fontWeight: 400, marginBottom: 20}}>Discover</div>
           <div style={{display: "flex", borderBottom: `0.5px solid ${C.border}`, marginBottom: 16}}>
             {DTABS.map(t => (
-              <button key={t.id} onClick={() => setDiscoverTab(t.id)} style={{flex: 1, padding: "10px 4px", background: "transparent", color: discoverTab === t.id ? C.text : C.textMuted, fontSize: 13, fontWeight: discoverTab === t.id ? 500 : 400, borderBottom: discoverTab === t.id ? `2px solid ${C.accent}` : "2px solid transparent"}}>
+              <button key={t.id} onClick={() => setDiscoverTab(t.id)} style={{marginRight: 22, paddingBottom: 9, background: "transparent", color: discoverTab === t.id ? C.text : C.textMuted, fontSize: 13, fontWeight: discoverTab === t.id ? 500 : 400, borderBottom: discoverTab === t.id ? `1.5px solid ${C.accent}` : "1.5px solid transparent"}}>
                 {t.label}
               </button>
             ))}
@@ -796,31 +734,29 @@ export default function App() {
         {/* ── Boards ── */}
         {discoverTab === "boards" && (
           <div style={{padding: "0 16px"}}>
-            <button onClick={() => {
-              const n = prompt("Board name:");
-              if (n) setBoards(p => [...p, {id: Date.now(), name: n, cover: null}]);
-            }} style={{width: "100%", padding: "12px", background: "transparent", border: `1px dashed ${C.borderMed}`, borderRadius: 12, color: C.textMuted, fontSize: 13, marginBottom: 14}}>
-              + New Board
-            </button>
-            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8}}>
               {boards.map(b => {
                 const bItems = savedItems.filter(s => s.boardId === b.id);
                 const cover = bItems.find(s => s.image)?.image || b.cover;
                 return (
-                  <div key={b.id} onClick={() => setViewBoard(b)} style={{borderRadius: 12, overflow: "hidden", cursor: "pointer", border: `0.5px solid ${C.border}`, position: "relative", aspectRatio: "4/5", background: C.surface}}>
+                  <div key={b.id} onClick={() => setViewBoard(b)} style={{borderRadius: 10, overflow: "hidden", cursor: "pointer", position: "relative", aspectRatio: "4/5", background: C.surface2}}>
                     {cover
                       ? <img src={cover} style={{width: "100%", height: "100%", objectFit: "cover"}} />
-                      : <div style={{width: "100%", height: "100%", background: `linear-gradient(135deg, ${C.surface2} 0%, ${C.bg} 100%)`, display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        <i className="ti ti-layout-masonry" style={{fontSize: 32, color: C.borderMed}} aria-hidden="true" />
+                      : <div style={{width: "100%", height: "100%", background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center"}}>
+                        <i className="ti ti-layout-masonry" style={{fontSize: 28, color: C.border}} aria-hidden="true" />
                       </div>
                     }
-                    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "28px 10px 10px", background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)"}}>
+                    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 10px 10px", background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)"}}>
                       <div style={{fontSize: 13, fontWeight: 500, color: "#fff"}}>{b.name}</div>
-                      <div style={{fontSize: 11, color: "rgba(255,255,255,0.6)"}}>{bItems.length} items</div>
+                      <div style={{fontSize: 10, color: "rgba(255,255,255,0.55)"}}>{bItems.length} items</div>
                     </div>
                   </div>
                 );
               })}
+              <div onClick={() => {const n = prompt("Board name:"); if (n) setBoards(p => [...p, {id: Date.now(), name: n, cover: null}]);}} style={{borderRadius: 10, aspectRatio: "4/5", background: C.surface2, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer"}}>
+                <i className="ti ti-plus" style={{fontSize: 22, color: C.textMuted}} aria-hidden="true" />
+                <div style={{fontSize: 11, color: C.textMuted}}>New Board</div>
+              </div>
             </div>
           </div>
         )}
@@ -828,10 +764,10 @@ export default function App() {
         {/* ── Saved ── */}
         {discoverTab === "saved" && (
           <div style={{padding: "0 16px"}}>
-            <div style={{display: "flex", gap: 6, overflowX: "auto", paddingBottom: 10, marginBottom: 6}}>
-              <button onClick={() => setSavedFilter(null)} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: savedFilter === null ? C.accent : C.surface, color: savedFilter === null ? "#fff" : C.textMid, fontSize: 11, border: `0.5px solid ${savedFilter === null ? C.accent : C.border}`}}>All</button>
+            <div style={{display: "flex", gap: 4, overflowX: "auto", paddingBottom: 10, marginBottom: 6}}>
+              <button onClick={() => setSavedFilter(null)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === null ? C.accent : "transparent", color: savedFilter === null ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>All</button>
               {boards.map(b => (
-                <button key={b.id} onClick={() => setSavedFilter(b.id)} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: savedFilter === b.id ? C.accent : C.surface, color: savedFilter === b.id ? "#fff" : C.textMid, fontSize: 11, border: `0.5px solid ${savedFilter === b.id ? C.accent : C.border}`}}>
+                <button key={b.id} onClick={() => setSavedFilter(b.id)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === b.id ? C.accent : "transparent", color: savedFilter === b.id ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>
                   {b.name}
                 </button>
               ))}
@@ -1866,8 +1802,8 @@ export default function App() {
   ];
   return (
     <>
-      <style>{`*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Karla:wght@300;400;500&display=swap');`}</style>
-      <div style={{paddingTop: 54, minHeight: "100vh"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text}}input,select,textarea{font-family:inherit;font-size:14px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100vh", paddingTop: 54, paddingBottom: 88}}>
         {tab === "today" && <TodayScreen />}
         {tab === "closet" && <ClosetScreen />}
         {tab === "calendar" && <CalendarScreen />}
@@ -1875,12 +1811,11 @@ export default function App() {
         {tab === "discover" && <DiscoverScreen />}
       </div>
 
-      <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: C.surface, borderTop: `0.5px solid ${C.border}`, display: "flex", zIndex: 100}}>
-
+      <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderTop: `0.5px solid rgba(0,0,0,0.06)`, display: "flex", zIndex: 100}}>
         {NAV.map(n => (
-          <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 22px", background: "transparent", gap: 4, color: tab === n.id ? C.accent : C.textMuted}}>
-            <i className={`ti ${n.icon}`} style={{fontSize: 21}} aria-hidden="true" />
-            <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.02em"}}>{n.label}</span>
+          <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "10px 0 24px", background: "transparent", gap: 3, color: tab === n.id ? C.accent : C.textMuted}}>
+            <i className={`ti ${n.icon}`} style={{fontSize: 20}} aria-hidden="true" />
+            <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.03em"}}>{n.label}</span>
           </button>
         ))}
       </div>
