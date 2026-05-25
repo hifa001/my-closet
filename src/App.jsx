@@ -92,12 +92,42 @@ const ICON_BG_PRESETS = [
 ];
 const photoBg = (iconBg) => iconBg === "checker" ? CHECKER_BG : (iconBg || "transparent");
 
+const SUB_ICON = {
+  // Tops
+  "T-shirt": "shirt", "Blouse": "shirt", "Shirt": "shirt", "Sweater": "shirt",
+  "Hoodie": "shirt", "Tank": "shirt", "Cardigan": "shirt",
+  // Bottoms — no pants icon in Tabler; use hanger to distinguish from tops
+  "Jeans": "hanger", "Trousers": "hanger", "Shorts": "hanger", "Skirt": "hanger", "Leggings": "hanger",
+  // One Piece
+  "Dress": "hanger", "Jumpsuit": "hanger", "Romper": "hanger", "Co-ord": "hanger",
+  // Outerwear
+  "Coat": "shirt", "Jacket": "shirt", "Blazer": "shirt", "Vest": "shirt", "Puffer": "shirt",
+  // Shoes
+  "Sneakers": "shoe", "Heels": "shoe", "Boots": "shoe",
+  "Loafers": "shoe", "Sandals": "shoe", "Flats": "shoe",
+  // Accessories
+  "Bag": "backpack", "Hat": "crown", "Belt": "tag",
+  "Scarf": "sparkles", "Jewelry": "diamond", "Sunglasses": "sunglasses", "Watch": "clock",
+  // Activewear & Swimwear
+  "Sports Bra": "shirt", "One-piece": "droplet", "Bikini": "droplet", "Cover-up": "droplet",
+};
+
 function Placeholder({item, size = 80}) {
-  const bg = item.hex === "#f0f0f0" ? "#ddd" : item.hex + "30";
+  // Determine if the item color is too light to be visible
+  const hex = item.hex || "#888888";
+  const r = parseInt(hex.slice(1, 3), 16) || 0;
+  const g = parseInt(hex.slice(3, 5), 16) || 0;
+  const b = parseInt(hex.slice(5, 7), 16) || 0;
+  const luminance = (r * 299 + g * 587 + b * 114) / 1000;
+  const isLight = luminance > 200;
+  const iconColor = isLight ? "#b8b8b8" : hex;
+  const bg = isLight ? "#f0f0f0" : hex + "22";
+  const iconName = SUB_ICON[item.sub] || (item.category === "Shoes" ? "shoe" : item.category === "Accessories" ? "sunglasses" : "hanger");
+  const iconSize = Math.max(18, size * 0.38);
   return (
-    <div style={{width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4}}>
-      <div style={{width: size * 0.32, height: size * 0.32, borderRadius: "50%", background: item.hex, border: item.color === "White" ? `1px solid ${C.border}` : "none"}} />
-      <div style={{fontSize: Math.max(8, size * 0.1), color: C.textMuted, textAlign: "center"}}>{item.sub || item.category}</div>
+    <div style={{width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3}}>
+      <i className={`ti ti-${iconName}`} style={{fontSize: iconSize, color: iconColor, lineHeight: 1}} />
+      <div style={{fontSize: Math.max(7, size * 0.095), color: C.textMuted, textAlign: "center", letterSpacing: "0.01em"}}>{item.sub || item.category}</div>
     </div>
   );
 }
