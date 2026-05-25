@@ -53,32 +53,44 @@ const SAMPLE = [
 
 const BOOKMARKS = ["Ganni", "Faithfull The Brand", "Kotn", "Reformation", "Toteme", "Arket"];
 
+// feed:true = confirmed public Shopify products.json API
 const BRAND_CATALOG = [
-  {handle: "ganni", name: "Ganni", url: "https://www.ganni.com"},
-  {handle: "reformation", name: "Reformation", url: "https://www.thereformation.com"},
-  {handle: "toteme", name: "Toteme", url: "https://toteme-studio.com"},
-  {handle: "arket", name: "Arket", url: "https://www.arket.com"},
-  {handle: "kotn", name: "Kotn", url: "https://kotn.com"},
-  {handle: "cos", name: "COS", url: "https://www.cos.com"},
-  {handle: "sezane", name: "Sézane", url: "https://www.sezane.com"},
-  {handle: "andotherstories", name: "& Other Stories", url: "https://www.stories.com"},
-  {handle: "aritzia", name: "Aritzia", url: "https://www.aritzia.com"},
-  {handle: "zara", name: "Zara", url: "https://www.zara.com"},
-  {handle: "mango", name: "Mango", url: "https://www.mango.com"},
-  {handle: "acnestudios", name: "Acne Studios", url: "https://www.acnestudios.com"},
-  {handle: "isabelmarant", name: "Isabel Marant", url: "https://www.isabelmarant.com"},
-  {handle: "stellamccartney", name: "Stella McCartney", url: "https://www.stellamccartney.com"},
-  {handle: "amiparis", name: "AMI Paris", url: "https://www.amiparis.com"},
-  {handle: "jcrew", name: "J.Crew", url: "https://www.jcrew.com"},
-  {handle: "madewell", name: "Madewell", url: "https://www.madewell.com"},
-  {handle: "everlane", name: "Everlane", url: "https://www.everlane.com"},
-  {handle: "ragbone", name: "Rag & Bone", url: "https://www.rag-bone.com"},
-  {handle: "vince", name: "Vince", url: "https://www.vince.com"},
-  {handle: "faithfull", name: "Faithfull The Brand", url: "https://faithfullthebrand.com"},
-  {handle: "freeople", name: "Free People", url: "https://www.freepeople.com"},
-  {handle: "anthropologie", name: "Anthropologie", url: "https://www.anthropologie.com"},
-  {handle: "revolve", name: "Revolve", url: "https://www.revolve.com"},
-  {handle: "mmlafleur", name: "M.M. LaFleur", url: "https://mmlafleur.com"},
+  {handle: "everlane", name: "Everlane", url: "https://www.everlane.com", feed: true},
+  {handle: "faithfull", name: "Faithfull The Brand", url: "https://faithfullthebrand.com", feed: true},
+  {handle: "mmlafleur", name: "M.M. LaFleur", url: "https://mmlafleur.com", feed: true},
+  {handle: "staud", name: "Staud", url: "https://www.staud.clothing", feed: true},
+  {handle: "ullajohnson", name: "Ulla Johnson", url: "https://ullajohnson.com", feed: true},
+  {handle: "lisasaysgah", name: "Lisa Says Gah", url: "https://lisasaysgah.com", feed: true},
+  {handle: "cuyana", name: "Cuyana", url: "https://www.cuyana.com", feed: true},
+  {handle: "outdoorvoices", name: "Outdoor Voices", url: "https://www.outdoorvoices.com", feed: true},
+  {handle: "girlfriendcollective", name: "Girlfriend Collective", url: "https://www.girlfriend.com", feed: true},
+  {handle: "colorfulstandard", name: "Colorful Standard", url: "https://colorfulstandard.com", feed: true},
+  {handle: "hunzag", name: "Hunza G", url: "https://hunzag.com", feed: true},
+  {handle: "frankiesbikinis", name: "Frankie's Bikinis", url: "https://frankiesbikinis.com", feed: true},
+  {handle: "universalstandard", name: "Universal Standard", url: "https://www.universalstandard.com", feed: true},
+  {handle: "loefflerrandall", name: "Loeffler Randall", url: "https://www.loefflerrandall.com", feed: true},
+  {handle: "ganni", name: "Ganni", url: "https://www.ganni.com", feed: false},
+  {handle: "reformation", name: "Reformation", url: "https://www.thereformation.com", feed: false},
+  {handle: "toteme", name: "Toteme", url: "https://toteme-studio.com", feed: false},
+  {handle: "stellamccartney", name: "Stella McCartney", url: "https://www.stellamccartney.com", feed: false},
+  {handle: "sezane", name: "Sézane", url: "https://www.sezane.com", feed: false},
+  {handle: "andotherstories", name: "& Other Stories", url: "https://www.stories.com", feed: false},
+  {handle: "aritzia", name: "Aritzia", url: "https://www.aritzia.com", feed: false},
+  {handle: "acnestudios", name: "Acne Studios", url: "https://www.acnestudios.com", feed: false},
+  {handle: "isabelmarant", name: "Isabel Marant", url: "https://www.isabelmarant.com", feed: false},
+  {handle: "arket", name: "Arket", url: "https://www.arket.com", feed: false},
+  {handle: "cos", name: "COS", url: "https://www.cos.com", feed: false},
+  {handle: "zara", name: "Zara", url: "https://www.zara.com", feed: false},
+  {handle: "mango", name: "Mango", url: "https://www.mango.com", feed: false},
+  {handle: "kotn", name: "Kotn", url: "https://kotn.com", feed: false},
+  {handle: "jcrew", name: "J.Crew", url: "https://www.jcrew.com", feed: false},
+  {handle: "madewell", name: "Madewell", url: "https://www.madewell.com", feed: false},
+  {handle: "ragbone", name: "Rag & Bone", url: "https://www.rag-bone.com", feed: false},
+  {handle: "freeople", name: "Free People", url: "https://www.freepeople.com", feed: false},
+  {handle: "anthropologie", name: "Anthropologie", url: "https://www.anthropologie.com", feed: false},
+  {handle: "revolve", name: "Revolve", url: "https://www.revolve.com", feed: false},
+  {handle: "amiparis", name: "AMI Paris", url: "https://www.amiparis.com", feed: false},
+  {handle: "vince", name: "Vince", url: "https://www.vince.com", feed: false},
 ];
 const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"};
 
@@ -234,7 +246,7 @@ export default function App() {
     if (tab === "discover" && discoverTab === "feed" && followedBrands.length > 0) {
       loadFeed(followedBrands);
     }
-  }, [tab]);
+  }, [tab, discoverTab]);
 
   useEffect(() => {
     localStorage.setItem('closet-items', JSON.stringify(items));
@@ -398,11 +410,11 @@ export default function App() {
 
   const TodayScreen = () => (
     <div style={{padding: "0 0 20px"}}>
-      <div style={{padding: "36px 20px 28px"}}>
+      <div style={{padding: "20px 20px 20px"}}>
         <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6}}>
           {new Date().toLocaleDateString("en-US", {weekday: "long", month: "long", day: "numeric"})}
         </div>
-        <div style={{fontSize: 34, fontFamily: PF, fontWeight: 400, lineHeight: 1.15}}>Good morning</div>
+        <div style={{fontSize: 32, fontFamily: PF, fontWeight: 400, lineHeight: 1.15}}>Good morning</div>
       </div>
 
       <div style={{padding: "0 20px 24px", borderBottom: `0.5px solid ${C.border}`}}>
@@ -462,7 +474,7 @@ export default function App() {
 
   const ClosetScreen = () => (
     <div style={{paddingBottom: 20}}>
-      <div style={{padding: "0 16px 10px"}}>
+      <div style={{padding: "12px 16px 10px"}}>
         <div style={{display: "flex", alignItems: "center", gap: 8, background: C.surface2, borderRadius: 22, padding: "9px 14px"}}>
           <i className="ti ti-search" style={{fontSize: 14, color: C.textMuted}} aria-hidden="true" />
           <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search brand, category, hashtag…" style={{border: "none", background: "transparent", outline: "none", flex: 1, fontSize: 13, padding: 0}} />
@@ -714,33 +726,56 @@ export default function App() {
     setBrandResults(BRAND_CATALOG.filter(b => b.name.toLowerCase().includes(lower)).slice(0, 10));
   };
 
+  const fetchRealProducts = async (brand) => {
+    const hostname = new URL(brand.url).hostname;
+    const endpoints = [
+      `${brand.url}/products.json?limit=12`,
+      `${brand.url}/collections/all/products.json?limit=12`,
+    ];
+    for (const apiUrl of endpoints) {
+      try {
+        const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(apiUrl)}`, {signal: AbortSignal.timeout(4000)});
+        if (!r.ok) continue;
+        // Skip without downloading body if server returns HTML
+        if (!(r.headers.get('content-type') || '').includes('json')) continue;
+        const data = await r.json();
+        if (!data.products?.length) continue;
+        return data.products.map(p => ({
+          id: `${brand.handle}-${p.id}`,
+          title: p.title,
+          image: p.images?.[0]?.src?.split('?')[0] || null,
+          price: p.variants?.[0]?.price || null,
+          url: `https://${hostname}/products/${p.handle}`,
+          brandName: brand.name,
+          brandHandle: brand.handle,
+        }));
+      } catch { continue; }
+    }
+    return null;
+  };
+
   const loadFeed = async (brands) => {
     if (brands.length === 0) {setFeedProducts([]); return;}
     setFeedLoading(true);
     try {
-      const count = Math.min(brands.length * 8, 48);
-      const q = `{ products(first: ${count}) { edges { node { id title priceRange { minVariantPrice { amount currencyCode } } images(first: 1) { edges { node { url } } } } } } }`;
-      const res = await fetch("https://mock.shop/api", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({query: q}),
+      const settled = await Promise.allSettled(brands.map(b => fetchRealProducts(b)));
+      const prods = [];
+      const browseCards = [];
+      settled.forEach((r, i) => {
+        if (r.status === 'fulfilled' && r.value?.length) {
+          prods.push(...r.value);
+        } else {
+          // Brand has no public API — add a single browse card
+          browseCards.push({
+            id: `browse-${brands[i].handle}`,
+            browseOnly: true,
+            url: brands[i].url,
+            brandName: brands[i].name,
+            brandHandle: brands[i].handle,
+          });
+        }
       });
-      const {data} = await res.json();
-      const prods = data.products.edges.map((e, i) => {
-        const brand = brands[i % brands.length];
-        const {amount} = e.node.priceRange.minVariantPrice;
-        return {
-          id: e.node.id,
-          title: e.node.title,
-          image: e.node.images.edges[0]?.node.url || null,
-          price: parseFloat(amount).toFixed(0),
-          url: brand.url,
-          brandName: brand.name,
-          brandHandle: brand.handle,
-        };
-      });
-      // shuffle so brands are interleaved
-      setFeedProducts(prods.sort(() => Math.random() - 0.5));
+      setFeedProducts([...prods.sort(() => Math.random() - 0.5), ...browseCards]);
     } catch {
       setFeedProducts([]);
     } finally {
@@ -752,7 +787,7 @@ export default function App() {
     const displayed = savedFilter ? savedItems.filter(s => s.boardId === savedFilter) : savedItems;
     return (
       <div style={{paddingBottom: 20}}>
-        <div style={{padding: "20px 20px 14px"}}>
+        <div style={{padding: "14px 20px 12px"}}>
           <div style={{fontSize: 24, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif"}}>Discover</div>
         </div>
 
@@ -786,10 +821,17 @@ export default function App() {
             ) : (
               <>
                 {/* followed brands pills */}
-                <div style={{display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto", borderBottom: `0.5px solid ${C.border}`}}>
+                <div style={{display: "flex", gap: 6, padding: "10px 16px", overflowX: "auto", borderBottom: `0.5px solid ${C.border}`}}>
                   {followedBrands.map(b => (
-                    <div key={b.handle} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: C.surface2, fontSize: 11, color: C.textMid, whiteSpace: "nowrap"}}>
-                      {b.name}
+                    <div key={b.handle} style={{flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "5px 7px 5px 11px", borderRadius: 20, background: C.surface2, whiteSpace: "nowrap"}}>
+                      <span style={{fontSize: 11, color: C.textMid}}>{b.name}</span>
+                      <button
+                        onClick={() => {
+                          setFollowedBrands(p => p.filter(f => f.handle !== b.handle));
+                          setFeedProducts(p => p.filter(fp => fp.brandHandle !== b.handle));
+                        }}
+                        style={{width: 16, height: 16, borderRadius: 8, background: "rgba(0,0,0,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: C.textMid, lineHeight: 1, flexShrink: 0}}
+                      >×</button>
                     </div>
                   ))}
                   <button onClick={() => setDiscoverTab("brands")} style={{flexShrink: 0, padding: "5px 12px", borderRadius: 20, background: "transparent", border: `1px dashed ${C.borderMed}`, fontSize: 11, color: C.textMuted, whiteSpace: "nowrap"}}>+ Add brand</button>
@@ -797,11 +839,37 @@ export default function App() {
 
                 {/* product grid */}
                 <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: C.border}}>
-                  {feedProducts.map((product, i) => (
+                  {feedProducts.map((product, i) => product.browseOnly ? (
+                    // Browse-only card for brands without a public API
+                    <a key={product.id} href={product.url} target="_blank" rel="noreferrer" style={{textDecoration: "none", color: "inherit", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, aspectRatio: "3/4", padding: 16}}>
+                      <i className="ti ti-external-link" style={{fontSize: 22, color: C.border}} aria-hidden="true" />
+                      <div style={{textAlign: "center"}}>
+                        <div style={{fontSize: 11, fontWeight: 500, color: C.text, marginBottom: 4}}>{product.brandName}</div>
+                        <div style={{fontSize: 10, color: C.textMuted, lineHeight: 1.4}}>No automatic feed</div>
+                        <div style={{fontSize: 10, color: C.textMuted}}>Clip items manually ↓</div>
+                      </div>
+                    </a>
+                  ) : (
                     <div key={`${product.id}-${i}`} style={{background: "#fff", position: "relative"}}>
                       <a href={product.url} target="_blank" rel="noreferrer" style={{textDecoration: "none", color: "inherit"}}>
-                        <div style={{aspectRatio: "3/4", background: C.surface2, overflow: "hidden"}}>
-                          <img src={product.image} alt={product.title} style={{width: "100%", height: "100%", objectFit: "cover"}} loading="lazy" />
+                        <div style={{aspectRatio: "3/4", background: "#f5f5f5", overflow: "hidden", position: "relative"}}>
+                          {product.image && (
+                            <img
+                              src={product.image}
+                              alt={product.title}
+                              style={{width: "100%", height: "100%", objectFit: "cover", display: "block"}}
+                              loading="lazy"
+                              onError={e => {
+                                e.currentTarget.style.display = "none";
+                                const fb = e.currentTarget.parentElement.querySelector(".feed-fb");
+                                if (fb) fb.style.display = "flex";
+                              }}
+                            />
+                          )}
+                          <div className="feed-fb" style={{display: product.image ? "none" : "flex", position: "absolute", inset: 0, flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, background: "#f5f5f5"}}>
+                            <i className="ti ti-shopping-bag" style={{fontSize: 36, color: "#d8d8d8"}} aria-hidden="true" />
+                            <div style={{fontSize: 10, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", padding: "0 8px"}}>{product.brandName}</div>
+                          </div>
                         </div>
                         <div style={{padding: "8px 10px 12px"}}>
                           <div style={{fontSize: 10, color: C.textMuted, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 2}}>{product.brandName}</div>
@@ -809,7 +877,6 @@ export default function App() {
                           {product.price && <div style={{fontSize: 12, color: C.textMuted}}>${product.price}</div>}
                         </div>
                       </a>
-                      {/* save to closet button */}
                       <button onClick={() => {
                         setForm({...EMPTY, name: product.title, brand: product.brandName, price: product.price || "", url: product.url, photo: product.image});
                         setShowAdd(true);
@@ -845,7 +912,10 @@ export default function App() {
                   return (
                     <div key={b.handle} style={{display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `0.5px solid ${C.border}`}}>
                       <div>
-                        <div style={{fontSize: 14, fontWeight: 500}}>{b.name}</div>
+                        <div style={{display: "flex", alignItems: "center", gap: 6}}>
+                          <div style={{fontSize: 14, fontWeight: 500}}>{b.name}</div>
+                          {b.feed && <span style={{fontSize: 9, fontWeight: 600, letterSpacing: "0.05em", color: "#2a7a30", background: "#e8f5e9", borderRadius: 4, padding: "1px 5px"}}>LIVE FEED</span>}
+                        </div>
                         <div style={{fontSize: 11, color: C.textMuted, marginTop: 2}}>{b.url.replace("https://", "")}</div>
                       </div>
                       <button onClick={() => {
@@ -1255,15 +1325,38 @@ export default function App() {
         )}
 
         {clipStep === 0 && <>
-          <input value={clipUrl} onChange={e => setClipUrl(e.target.value)} placeholder="Paste product URL here…" style={{marginBottom: 12}} />
+          <input value={clipUrl} onChange={e => setClipUrl(e.target.value)} placeholder="Paste product URL here…" style={{marginBottom: 12}}
+            onKeyDown={e => { if (e.key === 'Enter' && clipUrl) e.target.nextSibling?.click(); }} />
           <button onClick={async () => {
             if (!clipUrl) return;
             setClipStep(1);
             try {
-              const res = await fetch(`/api/clip?url=${encodeURIComponent(clipUrl)}`);
-              const data = await res.json();
-              setClipMeta(data);
-            } catch {}
+              const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(clipUrl)}`, {signal: AbortSignal.timeout(12000)});
+              const html = await r.text();
+              const ogGet = prop => {
+                const m = html.match(new RegExp(`<meta[^>]+property=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i'))
+                         || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${prop}["']`, 'i'));
+                return m?.[1]?.trim() || null;
+              };
+              const nameGet = prop => {
+                const m = html.match(new RegExp(`<meta[^>]+name=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i'))
+                         || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${prop}["']`, 'i'));
+                return m?.[1]?.trim() || null;
+              };
+              const rawTitle = ogGet('og:title') || nameGet('twitter:title') || (() => {
+                const m = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+                return m?.[1]?.trim() || null;
+              })();
+              // Clean brand name from title (e.g. "Melissa Flip Flop in Red | GANNI US" → "Melissa Flip Flop in Red")
+              const title = rawTitle?.replace(/\s*[\|–\-]\s*[^|–\-]+$/, '').trim() || rawTitle;
+              setClipMeta({
+                title,
+                image: ogGet('og:image') || nameGet('twitter:image'),
+                price: ogGet('og:price:amount') || ogGet('product:price:amount'),
+              });
+            } catch {
+              setClipMeta(null);
+            }
             setClipStep(2);
           }} style={{width: "100%", padding: "13px", background: C.accent, color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 500}}>
             Fetch Item
@@ -1988,7 +2081,7 @@ export default function App() {
   };
 
   const NAV = [
-    {id: "today", icon: "ti-home", label: "Today"},
+    {id: "today", icon: "ti-home", label: "Home"},
     {id: "closet", icon: "ti-hanger", label: "Closet"},
     {id: "_add", center: true},
     {id: "discover", icon: "ti-compass", label: "Discover"},
@@ -1996,19 +2089,25 @@ export default function App() {
   ];
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}html{height:-webkit-fill-available}body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text};min-height:100dvh;min-height:-webkit-fill-available;overscroll-behavior:none}input,select,textarea{font-family:inherit;font-size:16px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100dvh", paddingTop: "calc(54px + env(safe-area-inset-top, 0px))", paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))"}}>
-        {tab === "today" && <TodayScreen />}
-        {tab === "closet" && <ClosetScreen />}
-        {tab === "calendar" && <CalendarScreen />}
-        {tab === "style" && <StyleScreen />}
-        {tab === "discover" && <DiscoverScreen />}
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}html{height:-webkit-fill-available}body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:${C.bg};color:${C.text};min-height:100dvh;min-height:-webkit-fill-available;overscroll-behavior:none}input,select,textarea{font-family:inherit;font-size:16px;color:${C.text};background:${C.surface};border:1px solid ${C.border};border-radius:10px;padding:10px 14px;width:100%;outline:none}input:focus,select:focus,textarea:focus{border-color:${C.accentMid}}textarea{resize:none;line-height:1.5}button{font-family:inherit;cursor:pointer;border:none;outline:none}::-webkit-scrollbar{display:none}@keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.screen-fade{animation:fadeIn 0.18s ease}`}</style>
+      <div style={{maxWidth: 430, margin: "0 auto", background: C.bg, minHeight: "100dvh", paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "calc(72px + env(safe-area-inset-bottom, 0px))"}}>
+        {tab === "today" && <div className="screen-fade">{TodayScreen()}</div>}
+        {tab === "closet" && <div className="screen-fade">{ClosetScreen()}</div>}
+        {tab === "calendar" && <div className="screen-fade">{CalendarScreen()}</div>}
+        {tab === "style" && <div className="screen-fade">{StyleScreen()}</div>}
+        {tab === "discover" && <div className="screen-fade">{DiscoverScreen()}</div>}
       </div>
 
       <div style={{position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(255,255,255,0.94)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderTop: `0.5px solid rgba(0,0,0,0.06)`, display: "flex", flexDirection: "column", zIndex: 100}}>
         <div style={{display: "flex"}}>
-          {NAV.map(n => (
-            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 0 8px", background: "transparent", gap: 3, color: tab === n.id ? C.accent : C.textMuted}}>
+          {NAV.map(n => n.center ? (
+            <button key={n.id} onClick={openAdd} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "6px 0 8px", background: "transparent", border: "none"}}>
+              <div style={{width: 46, height: 46, borderRadius: 23, background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 10px rgba(0,0,0,0.18)"}}>
+                <i className="ti ti-plus" style={{fontSize: 22, color: "#fff"}} aria-hidden="true" />
+              </div>
+            </button>
+          ) : (
+            <button key={n.id} onClick={() => setTab(n.id)} style={{flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 0 8px", background: "transparent", gap: 3, color: tab === n.id ? C.accent : C.textMuted, transition: "color 0.15s"}}>
               <i className={`ti ${n.icon}`} style={{fontSize: 20}} aria-hidden="true" />
               <span style={{fontSize: 9, fontWeight: tab === n.id ? 500 : 400, letterSpacing: "0.03em"}}>{n.label}</span>
             </button>
@@ -2017,14 +2116,14 @@ export default function App() {
         <div style={{height: "env(safe-area-inset-bottom, 0px)"}} />
       </div>
 
-      {showAdd && <AddSheet />}
-      {showClip && <ClipSheet />}
-      {showPinPicker && <PinPickerSheet />}
+      {showAdd && AddSheet()}
+      {showClip && ClipSheet()}
+      {showPinPicker && PinPickerSheet()}
       {showOutfitBuilder && <OutfitBuilder />}
       {showCollage && <OutfitCollage />}
-      {showGhostModel && <GhostModel />}
-      {showCalDay && <CalendarDaySheet />}
-      {viewBoard && <BoardDetailView />}
+      {showGhostModel && GhostModel()}
+      {showCalDay && CalendarDaySheet()}
+      {viewBoard && BoardDetailView()}
     </>
   );
 }
