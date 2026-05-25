@@ -52,6 +52,34 @@ const SAMPLE = [
 ];
 
 const BOOKMARKS = ["Ganni", "Faithfull The Brand", "Kotn", "Reformation", "Toteme", "Arket"];
+
+const BRAND_CATALOG = [
+  {handle: "ganni", name: "Ganni", url: "https://www.ganni.com"},
+  {handle: "reformation", name: "Reformation", url: "https://www.thereformation.com"},
+  {handle: "toteme", name: "Toteme", url: "https://toteme-studio.com"},
+  {handle: "arket", name: "Arket", url: "https://www.arket.com"},
+  {handle: "kotn", name: "Kotn", url: "https://kotn.com"},
+  {handle: "cos", name: "COS", url: "https://www.cos.com"},
+  {handle: "sezane", name: "Sézane", url: "https://www.sezane.com"},
+  {handle: "andotherstories", name: "& Other Stories", url: "https://www.stories.com"},
+  {handle: "aritzia", name: "Aritzia", url: "https://www.aritzia.com"},
+  {handle: "zara", name: "Zara", url: "https://www.zara.com"},
+  {handle: "mango", name: "Mango", url: "https://www.mango.com"},
+  {handle: "acnestudios", name: "Acne Studios", url: "https://www.acnestudios.com"},
+  {handle: "isabelmarant", name: "Isabel Marant", url: "https://www.isabelmarant.com"},
+  {handle: "stellamccartney", name: "Stella McCartney", url: "https://www.stellamccartney.com"},
+  {handle: "amiparis", name: "AMI Paris", url: "https://www.amiparis.com"},
+  {handle: "jcrew", name: "J.Crew", url: "https://www.jcrew.com"},
+  {handle: "madewell", name: "Madewell", url: "https://www.madewell.com"},
+  {handle: "everlane", name: "Everlane", url: "https://www.everlane.com"},
+  {handle: "ragbone", name: "Rag & Bone", url: "https://www.rag-bone.com"},
+  {handle: "vince", name: "Vince", url: "https://www.vince.com"},
+  {handle: "faithfull", name: "Faithfull The Brand", url: "https://faithfullthebrand.com"},
+  {handle: "freeople", name: "Free People", url: "https://www.freepeople.com"},
+  {handle: "anthropologie", name: "Anthropologie", url: "https://www.anthropologie.com"},
+  {handle: "revolve", name: "Revolve", url: "https://www.revolve.com"},
+  {handle: "mmlafleur", name: "M.M. LaFleur", url: "https://mmlafleur.com"},
+];
 const EMPTY = {brand: "", name: "", category: "Tops", sub: "T-shirt", size: "", color: "Black", hex: "#1a1a1a", material: "Cotton", price: "", wears: 0, secondhand: false, season: "All Season", condition: "Good", note: "", desc: "", origin: "", url: "", photo: null, conditionDetails: "", iconBg: "transparent"};
 
 const CHECKER_BG = "repeating-conic-gradient(#d8d8d8 0% 25%,#ffffff 0% 50%) 0 0/14px 14px";
@@ -152,7 +180,7 @@ export default function App() {
   const [savedItems, setSavedItems] = useState(() => {
     try {const s = localStorage.getItem('closet-saved'); return s ? JSON.parse(s) : [];} catch {return [];}
   });
-  const [discoverTab, setDiscoverTab] = useState("shop");
+  const [discoverTab, setDiscoverTab] = useState("feed");
   const [viewBoard, setViewBoard] = useState(null);
   const [savedFilter, setSavedFilter] = useState(null);
   const [discoverSearch, setDiscoverSearch] = useState("");
@@ -172,7 +200,11 @@ export default function App() {
   const [brandResults, setBrandResults] = useState([]);
   const [feedProducts, setFeedProducts] = useState([]);
   const [feedLoading, setFeedLoading] = useState(false);
-  const [discoverTab, setDiscoverTab] = useState("feed");
+  useEffect(() => {
+    if (tab === "discover" && discoverTab === "feed" && followedBrands.length > 0) {
+      loadFeed(followedBrands);
+    }
+  }, [tab]);
 
   useEffect(() => {
     localStorage.setItem('closet-items', JSON.stringify(items));
@@ -646,33 +678,48 @@ export default function App() {
     );
   };
 
-  const searchBrands = async (q) => {
-    if (!q) {setBrandResults([]); return;}
-    const res = await fetch(`/api/brands?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-    setBrandResults(data.results || []);
+  const searchBrands = (q) => {
+    if (!q.trim()) {setBrandResults([]); return;}
+    const lower = q.toLowerCase();
+    setBrandResults(BRAND_CATALOG.filter(b => b.name.toLowerCase().includes(lower)).slice(0, 10));
   };
 
   const loadFeed = async (brands) => {
     if (brands.length === 0) {setFeedProducts([]); return;}
     setFeedLoading(true);
     try {
-      const results = await Promise.all(
-        brands.map(b => fetch(`/api/feed?url=${encodeURIComponent(b.url)}&limit=12`)
-          .then(r => r.json())
-          .then(d => (d.products || []).map(p => ({...p, brandName: b.name})))
-          .catch(() => [])
-        )
-      );
-      // shuffle all brand results together
-      const all = results.flat().sort(() => Math.random() - 0.5);
-      setFeedProducts(all);
+      const count = Math.min(brands.length * 8, 48);
+      const q = `{ products(first: ${count}) { edges { node { id title priceRange { minVariantPrice { amount currencyCode } } images(first: 1) { edges { node { url } } } } } } }`;
+      const res = await fetch("https://mock.shop/api", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: q}),
+      });
+      const {data} = await res.json();
+      const prods = data.products.edges.map((e, i) => {
+        const brand = brands[i % brands.length];
+        const {amount} = e.node.priceRange.minVariantPrice;
+        return {
+          id: e.node.id,
+          title: e.node.title,
+          image: e.node.images.edges[0]?.node.url || null,
+          price: parseFloat(amount).toFixed(0),
+          url: brand.url,
+          brandName: brand.name,
+          brandHandle: brand.handle,
+        };
+      });
+      // shuffle so brands are interleaved
+      setFeedProducts(prods.sort(() => Math.random() - 0.5));
+    } catch {
+      setFeedProducts([]);
     } finally {
       setFeedLoading(false);
     }
   };
 
   const DiscoverScreen = () => {
+    const displayed = savedFilter ? savedItems.filter(s => s.boardId === savedFilter) : savedItems;
     return (
       <div style={{paddingBottom: 20}}>
         <div style={{padding: "20px 20px 14px"}}>
@@ -681,7 +728,7 @@ export default function App() {
 
         {/* sub tabs */}
         <div style={{display: "flex", borderBottom: `1px solid ${C.border}`, marginBottom: 0}}>
-          {[["feed", "My Feed"], ["brands", "Brands"]].map(([id, label]) => (
+          {[["feed", "My Feed"], ["brands", "Brands"], ["boards", "Boards"], ["saved", "Saved"]].map(([id, label]) => (
             <button key={id} onClick={() => {
               setDiscoverTab(id);
               if (id === "feed") loadFeed(followedBrands);
@@ -811,6 +858,58 @@ export default function App() {
             )}
           </div>
         )}
+
+        {/* BOARDS TAB */}
+        {discoverTab === "boards" && (
+          <div style={{padding: "16px"}}>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8}}>
+              {boards.map(b => {
+                const bItems = savedItems.filter(s => s.boardId === b.id);
+                const cover = bItems.find(s => s.image)?.image || b.cover;
+                return (
+                  <div key={b.id} onClick={() => setViewBoard(b)} style={{borderRadius: 10, overflow: "hidden", cursor: "pointer", position: "relative", aspectRatio: "4/5", background: C.surface2}}>
+                    {cover
+                      ? <img src={cover} style={{width: "100%", height: "100%", objectFit: "cover"}} />
+                      : <div style={{width: "100%", height: "100%", background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center"}}>
+                        <i className="ti ti-layout-masonry" style={{fontSize: 28, color: C.border}} aria-hidden="true" />
+                      </div>
+                    }
+                    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 10px 10px", background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)"}}>
+                      <div style={{fontSize: 13, fontWeight: 500, color: "#fff"}}>{b.name}</div>
+                      <div style={{fontSize: 10, color: "rgba(255,255,255,0.55)"}}>{bItems.length} items</div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div onClick={() => {const n = prompt("Board name:"); if (n) setBoards(p => [...p, {id: Date.now(), name: n, cover: null}]);}} style={{borderRadius: 10, aspectRatio: "4/5", background: C.surface2, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer"}}>
+                <i className="ti ti-plus" style={{fontSize: 22, color: C.textMuted}} aria-hidden="true" />
+                <div style={{fontSize: 11, color: C.textMuted}}>New Board</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SAVED TAB */}
+        {discoverTab === "saved" && (
+          <div style={{padding: "0 16px"}}>
+            <div style={{display: "flex", gap: 4, overflowX: "auto", paddingBottom: 10, marginBottom: 6}}>
+              <button onClick={() => setSavedFilter(null)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === null ? C.accent : "transparent", color: savedFilter === null ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>All</button>
+              {boards.map(b => (
+                <button key={b.id} onClick={() => setSavedFilter(b.id)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === b.id ? C.accent : "transparent", color: savedFilter === b.id ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>
+                  {b.name}
+                </button>
+              ))}
+            </div>
+            {displayed.length === 0
+              ? <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted}}>
+                <i className="ti ti-bookmark" style={{fontSize: 36, display: "block", marginBottom: 10, opacity: 0.3}} aria-hidden="true" />
+                <div style={{fontSize: 13}}>No saved items yet</div>
+                <div style={{fontSize: 12, marginTop: 6, opacity: 0.7}}>Clip items from the web to save them here</div>
+              </div>
+              : <MasonryGrid items={displayed} />
+            }
+          </div>
+        )}
       </div>
     );
   };
@@ -866,142 +965,6 @@ export default function App() {
             <button onClick={() => ownThis({image: img, brand: p.vendor, name: p.title, price: price.toFixed(0), url: ""})} style={{fontSize: 10, color: C.textMuted, background: "transparent", padding: 0, textDecoration: "underline", textUnderlineOffset: 2}}>own it</button>
           </div>
         </div>
-      </div>
-    );
-  };
-
-  const DiscoverScreen = () => {
-    const DTABS = [{id: "shop", label: "Shop"}, {id: "boards", label: "Boards"}, {id: "saved", label: "Saved"}, {id: "search", label: "Search"}];
-    const displayed = savedFilter ? savedItems.filter(s => s.boardId === savedFilter) : savedItems;
-    const searchResults = discoverSearch
-      ? savedItems.filter(s => [s.brand, s.name].some(v => (v || "").toLowerCase().includes(discoverSearch.toLowerCase())))
-      : [];
-
-    return (
-      <div style={{paddingBottom: 20}}>
-        <div style={{padding: "36px 20px 0"}}>
-          <div style={{fontSize: 30, fontFamily: PF, fontWeight: 400, marginBottom: 20}}>Discover</div>
-          <div style={{display: "flex", borderBottom: `0.5px solid ${C.border}`, marginBottom: 16}}>
-            {DTABS.map(t => (
-              <button key={t.id} onClick={() => setDiscoverTab(t.id)} style={{marginRight: 22, paddingBottom: 9, background: "transparent", color: discoverTab === t.id ? C.text : C.textMuted, fontSize: 13, fontWeight: discoverTab === t.id ? 500 : 400, borderBottom: discoverTab === t.id ? `1.5px solid ${C.accent}` : "1.5px solid transparent"}}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Shop ── */}
-        {discoverTab === "shop" && (
-          <div style={{padding: "0 16px"}}>
-            {browseLoading && browseProducts.length === 0 ? (
-              <div style={{textAlign: "center", padding: "60px 20px"}}>
-                <div style={{width: 32, height: 32, border: `2px solid ${C.accent}`, borderTopColor: "transparent", borderRadius: 16, animation: "spin 0.8s linear infinite", margin: "0 auto 14px"}} />
-                <div style={{fontSize: 13, color: C.textMuted}}>Loading products…</div>
-              </div>
-            ) : browseProducts.length === 0 ? (
-              <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted}}>
-                <div style={{fontSize: 13}}>Couldn't load products</div>
-                <button onClick={() => fetchBrowse()} style={{marginTop: 12, padding: "8px 18px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13}}>Retry</button>
-              </div>
-            ) : (
-              <>
-                <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, alignItems: "start"}}>
-                  <div>{browseProducts.filter((_, i) => i % 2 === 0).map(p => <BrowseCard key={p.id} p={p} />)}</div>
-                  <div>{browseProducts.filter((_, i) => i % 2 === 1).map(p => <BrowseCard key={p.id} p={p} />)}</div>
-                </div>
-                {browseHasMore && (
-                  <button onClick={() => fetchBrowse(browseCursor)} disabled={browseLoading} style={{width: "100%", marginTop: 4, marginBottom: 16, padding: "13px", background: "transparent", border: `0.5px solid ${C.border}`, borderRadius: 12, fontSize: 13, color: browseLoading ? C.textMuted : C.textMid}}>
-                    {browseLoading ? "Loading…" : "Load more"}
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ── Boards ── */}
-        {discoverTab === "boards" && (
-          <div style={{padding: "0 16px"}}>
-            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8}}>
-              {boards.map(b => {
-                const bItems = savedItems.filter(s => s.boardId === b.id);
-                const cover = bItems.find(s => s.image)?.image || b.cover;
-                return (
-                  <div key={b.id} onClick={() => setViewBoard(b)} style={{borderRadius: 10, overflow: "hidden", cursor: "pointer", position: "relative", aspectRatio: "4/5", background: C.surface2}}>
-                    {cover
-                      ? <img src={cover} style={{width: "100%", height: "100%", objectFit: "cover"}} />
-                      : <div style={{width: "100%", height: "100%", background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        <i className="ti ti-layout-masonry" style={{fontSize: 28, color: C.border}} aria-hidden="true" />
-                      </div>
-                    }
-                    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 10px 10px", background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)"}}>
-                      <div style={{fontSize: 13, fontWeight: 500, color: "#fff"}}>{b.name}</div>
-                      <div style={{fontSize: 10, color: "rgba(255,255,255,0.55)"}}>{bItems.length} items</div>
-                    </div>
-                  </div>
-                );
-              })}
-              <div onClick={() => {const n = prompt("Board name:"); if (n) setBoards(p => [...p, {id: Date.now(), name: n, cover: null}]);}} style={{borderRadius: 10, aspectRatio: "4/5", background: C.surface2, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer"}}>
-                <i className="ti ti-plus" style={{fontSize: 22, color: C.textMuted}} aria-hidden="true" />
-                <div style={{fontSize: 11, color: C.textMuted}}>New Board</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Saved ── */}
-        {discoverTab === "saved" && (
-          <div style={{padding: "0 16px"}}>
-            <div style={{display: "flex", gap: 4, overflowX: "auto", paddingBottom: 10, marginBottom: 6}}>
-              <button onClick={() => setSavedFilter(null)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === null ? C.accent : "transparent", color: savedFilter === null ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>All</button>
-              {boards.map(b => (
-                <button key={b.id} onClick={() => setSavedFilter(b.id)} style={{flexShrink: 0, padding: "4px 12px", borderRadius: 20, background: savedFilter === b.id ? C.accent : "transparent", color: savedFilter === b.id ? "#fff" : C.textMuted, fontSize: 11, border: "none"}}>
-                  {b.name}
-                </button>
-              ))}
-            </div>
-            {displayed.length === 0
-              ? <div style={{textAlign: "center", padding: "40px 20px", color: C.textMuted}}>
-                <i className="ti ti-bookmark" style={{fontSize: 36, display: "block", marginBottom: 10, opacity: 0.3}} aria-hidden="true" />
-                <div style={{fontSize: 13}}>No saved items yet</div>
-                <div style={{fontSize: 12, marginTop: 6, opacity: 0.7}}>Clip items from the web to save them here</div>
-              </div>
-              : <MasonryGrid items={displayed} />
-            }
-          </div>
-        )}
-
-        {/* ── Search ── */}
-        {discoverTab === "search" && (
-          <div style={{padding: "0 16px"}}>
-            <input value={discoverSearch} onChange={e => setDiscoverSearch(e.target.value)} placeholder="Search saved items, brand, style…" style={{marginBottom: 14}} />
-            {discoverSearch ? (
-              searchResults.length > 0
-                ? <>
-                  <div style={{fontSize: 12, color: C.textMuted, marginBottom: 10}}>{searchResults.length} saved item{searchResults.length > 1 ? "s" : ""}</div>
-                  <MasonryGrid items={searchResults} />
-                </>
-                : <div style={{textAlign: "center", padding: "20px 0"}}>
-                  <div style={{fontSize: 13, color: C.textMuted, marginBottom: 16}}>Nothing saved — try the web</div>
-                  <a href={`https://www.google.com/search?q=${encodeURIComponent(discoverSearch + " clothing")}`} target="_blank" rel="noopener noreferrer" style={{display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 18px", background: C.accent, color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 500, textDecoration: "none"}}>
-                    <i className="ti ti-world-search" style={{fontSize: 15}} aria-hidden="true" />
-                    Search the web
-                  </a>
-                </div>
-            ) : (
-              <>
-                <div style={{fontSize: 11, color: C.textMuted, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10}}>Explore brands</div>
-                <div style={{display: "flex", flexWrap: "wrap", gap: 8}}>
-                  {["Ganni", "Toteme", "Reformation", "Kotn", "Arket", "Sézane", "& Other Stories", "Mango"].map(b => (
-                    <button key={b} onClick={() => setDiscoverSearch(b)} style={{padding: "6px 12px", background: C.surface, border: `0.5px solid ${C.border}`, borderRadius: 20, fontSize: 12, color: C.textMid}}>
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
       </div>
     );
   };
@@ -1999,13 +1962,7 @@ export default function App() {
     {id: "closet", icon: "ti-hanger", label: "Closet"},
     {id: "_add", center: true},
     {id: "discover", icon: "ti-compass", label: "Discover"},
-    {id: "shop", icon: "ti-shopping-bag", label: "Shop"},
-  ];
-  {id: "closet", icon: "ti-hanger", label: "Closet"},
-  {id: "calendar", icon: "ti-calendar", label: "Calendar"},
-  {id: "today", icon: "ti-home", label: "Today"},
-  {id: "style", icon: "ti-chart-pie-2", label: "Style"},
-  {id: "discover", icon: "ti-compass", label: "Discover"},
+    {id: "style", icon: "ti-chart-pie-2", label: "Style"},
   ];
   return (
     <>
@@ -2015,7 +1972,6 @@ export default function App() {
         {tab === "closet" && <ClosetScreen />}
         {tab === "calendar" && <CalendarScreen />}
         {tab === "style" && <StyleScreen />}
-        {tab === "discover" && <DiscoverScreen />}
         {tab === "discover" && <DiscoverScreen />}
       </div>
 
